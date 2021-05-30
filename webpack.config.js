@@ -13,6 +13,9 @@ module.exports = {
             }
         ]
     },
+    resolve: {
+        extensions: ['.ts', '.js']
+    },
     devServer: {
         publicPath: "/",
         contentBase: "./public",
