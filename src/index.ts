@@ -1,6 +1,7 @@
 import { BlockType } from "./BlockType";
 import { Map } from "./Map";
 import { Player } from "./Player";
+import { UnitVector } from "./UnitVector";
 
 let canvas: HTMLCanvasElement = document.querySelector('#canvas');
 const width = canvas.width;
@@ -27,7 +28,7 @@ let mapTemplate: BlockType[][] = [
 ]
 
 const map: Map = new Map(rows, cols, width, height, mapTemplate);
-const player: Player = new Player(50, 50, 0, map);
+const player: Player = new Player(50, 50, new UnitVector(0), map);
 
 // window.addEventListener('mousemove', (e) => {
 //     var rect = canvas.getBoundingClientRect();
