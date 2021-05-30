@@ -4,13 +4,13 @@ import { BlockType } from "./BlockType";
 
 export class Ray {
     uVecDir?: UnitVector;
-
+    startX?: number;
+    startY?: number;
     endX?: number;
     endY?: number;
     map?: Map;
 
-    constructor(uVecDir: UnitVector, map: Map) {
-        this.uVecDir = uVecDir;
+    constructor(map: Map) {
         this.map = map;
     }
 
@@ -24,9 +24,9 @@ export class Ray {
         return this.map.getBlocks()[curYBlockIndex][curXBlockIndex].getBlockType() === BlockType.Wall;
     }
 
-    calculateEnd(startX: number, startY: number): void {
-        let curX: number = startX;
-        let curY: number = startY;
+    calculateEnd(): void {
+        let curX: number = this.startX;
+        let curY: number = this.startY;
 
         while (!this.inBlock(curX, curY)) {
             curX += this.uVecDir.getX();
@@ -37,12 +37,19 @@ export class Ray {
         this.endY = curY;
     }
 
-    drawRay(canvas: HTMLCanvasElement, startX: number, startY: number): void {
+    setData(startX: number, startY: number, uVec: UnitVector): void {
+        this.startX = startX;
+        this.startY = startY;
+        this.uVecDir = uVec;
+    }
+
+    drawRay(canvas: HTMLCanvasElement): void {
         let ctx = canvas.getContext('2d');
-        this.calculateEnd(startX, startY);
+
+        this.calculateEnd();
 
         ctx.beginPath();
-        ctx.moveTo(startX, startY);
+        ctx.moveTo(this.startX, this.startY);
         ctx.lineTo(this.endX, this.endY);
         ctx.stroke();
     }
