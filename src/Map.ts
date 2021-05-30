@@ -48,4 +48,24 @@ export class Map {
         });
     }
 
+    getBlocks(): Block[][] {
+        return this.blocks;
+    }
+
+    getHeight(): number {
+        return this.height;
+    }
+
+    getWidth(): number {
+        return this.width;
+    }
+
+    getCols(): number {
+        return this.cols;
+    }
+
+    getRows(): number {
+        return this.rows;
+    }
+
 }

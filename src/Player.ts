@@ -103,11 +103,24 @@ export class Player {
         ctx.translate(-translationX, -translationY);
         
         ctx.fillRect(this.xPos, this.yPos, this.width, this.height);
-        ctx.beginPath();
-        ctx.moveTo(translationX, translationY);
-        ctx.lineTo(translationX+100, translationY);
-        ctx.stroke();
+       
+        // ctx.beginPath();
+        // ctx.moveTo(translationX, translationY);
+        // ctx.lineTo(translationX+100, translationY);
+        // ctx.stroke();
 
         ctx.setTransform(1, 0, 0, 1, 0, 0);
+    }
+
+    getUnitVec(): UnitVector {
+        return this.dirUVec;
+    }
+
+    getXMid(): number {
+        return this.xPos+this.width/2;
+    }
+
+    getYMid(): number {
+        return this.yPos+this.height/2;
     }
 }

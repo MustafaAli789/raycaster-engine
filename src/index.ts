@@ -1,6 +1,7 @@
 import { BlockType } from "./BlockType";
 import { Map } from "./Map";
 import { Player } from "./Player";
+import { Ray } from "./Ray";
 import { UnitVector } from "./UnitVector";
 
 let canvas: HTMLCanvasElement = document.querySelector('#canvas');
@@ -29,6 +30,7 @@ let mapTemplate: BlockType[][] = [
 
 const map: Map = new Map(rows, cols, width, height, mapTemplate);
 const player: Player = new Player(50, 50, new UnitVector(0), map);
+const ray: Ray = new Ray(player.getUnitVec(), map);
 
 // window.addEventListener('mousemove', (e) => {
 //     var rect = canvas.getBoundingClientRect();
@@ -44,6 +46,7 @@ function main(): void {
     clearCanvas(canvas);
     map.drawMap(canvas);
     player.draw(canvas);
+    ray.drawRay(canvas, player.getXMid(), player.getYMid());
 }
 
 setInterval(main, 1000/60);

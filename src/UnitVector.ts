@@ -1,7 +1,7 @@
 export class UnitVector {
-    x?: number;
-    y?: number;
-    dir?: number; //degree angle --> clockwise is pos
+    x?: number; //x component
+    y?: number; //y component
+    dir?: number; //degree angle --> clockwise is positive
 
     constructor(dir: number) {
         this.dir = dir;
