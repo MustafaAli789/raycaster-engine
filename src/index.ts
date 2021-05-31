@@ -1,13 +1,15 @@
 import { BlockType } from "./BlockType";
 import { Map } from "./Map";
 import { Player } from "./Player";
-import { Ray } from "./Ray";
 import { Rays } from "./Rays";
 import { UnitVector } from "./UnitVector";
 
-let canvas: HTMLCanvasElement = document.querySelector('#canvas');
-const width = canvas.width;
-const height = canvas.height;
+let canvas2D: HTMLCanvasElement = document.querySelector('#canvasLeft');
+let canvas3D: HTMLCanvasElement = document.querySelector('#canvasRight');
+const widthCanvas2D = canvas2D.width;
+const heightCanvas2D = canvas2D.height;
+const widthCanvas3D = canvas3D.width;
+const heightCanvas3D = canvas3D.height;
 const cols = 15;
 const rows = 15;
 
@@ -20,8 +22,8 @@ let mapTemplate: BlockType[][] = [
     [BlockType.Wall, BlockType.Empty, BlockType.Wall, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Wall],
     [BlockType.Wall, BlockType.Empty, BlockType.Wall, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Wall, BlockType.Wall],
     [BlockType.Wall, BlockType.Empty, BlockType.Wall, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Wall],
-    [BlockType.Wall, BlockType.Empty, BlockType.Wall, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Wall, BlockType.Empty, BlockType.Empty, BlockType.Wall, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Wall],
-    [BlockType.Wall, BlockType.Empty, BlockType.Wall, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Wall, BlockType.Empty, BlockType.Empty, BlockType.Wall, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Wall],
+    [BlockType.Wall, BlockType.Empty, BlockType.Wall, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Wall, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Wall],
+    [BlockType.Wall, BlockType.Empty, BlockType.Wall, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Wall, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Wall],
     [BlockType.Wall, BlockType.Empty, BlockType.Wall, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Wall, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Wall],
     [BlockType.Wall, BlockType.Empty, BlockType.Wall, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Wall],
     [BlockType.Wall, BlockType.Empty, BlockType.Wall, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Wall],
@@ -29,7 +31,7 @@ let mapTemplate: BlockType[][] = [
     [BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall],
 ]
 
-const map: Map = new Map(rows, cols, width, height, mapTemplate);
+const map: Map = new Map(rows, cols, widthCanvas2D, heightCanvas2D, mapTemplate);
 const player: Player = new Player(50, 50, new UnitVector(0), map);
 const rays: Rays = new Rays(map);
 
@@ -40,15 +42,17 @@ const rays: Rays = new Rays(map);
 
 function clearCanvas(canvas: HTMLCanvasElement): void {
     let ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, width, height);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
 function main(): void {
-    clearCanvas(canvas);
-    map.drawMap(canvas);
-    player.draw(canvas);
+    clearCanvas(canvas2D);
+    clearCanvas(canvas3D);
+    map.drawMap(canvas2D);
+    player.draw(canvas2D);
     rays.setData(player.getXMid(), player.getYMid(), player.getUnitVec());
-    rays.draw(canvas);
+    rays.draw2D(canvas2D);
+    rays.draw3D(canvas3D);
 }
 
 setInterval(main, 1000/60);

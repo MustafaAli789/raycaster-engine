@@ -8,7 +8,7 @@ export class Rays {
     startY: number;
     map?: Map;
     centerUVec?: UnitVector;
-    degSpread: number = 30;
+    degSpread: number = 60;
 
     constructor(map: Map) {
         this.map = map;
@@ -20,12 +20,12 @@ export class Rays {
     setData(startX: number, startY: number, centerUVec: UnitVector): void {
         for(let i =0; i < this.degSpread; i++) {
             let uVec: UnitVector = new UnitVector(centerUVec.getDirDeg());
-            uVec.updateDir(i+1);
+            uVec.updateDir(i*0.5+0.5);
             this.rays[i].setData(startX, startY, uVec);
         }
         for(let i =this.degSpread; i < this.degSpread*2; i++) {
             let uVec: UnitVector = new UnitVector(centerUVec.getDirDeg());
-            uVec.updateDir(-(i-this.degSpread)-1);
+            uVec.updateDir(-(i-this.degSpread)*0.5-0.5);
             this.rays[i].setData(startX, startY, uVec);
         }
 
@@ -33,8 +33,26 @@ export class Rays {
         this.rays[this.degSpread*2].setData(startX, startY, new UnitVector(centerUVec.getDirDeg()));
     }
 
-    draw(canvas: HTMLCanvasElement): void {
-        this.rays.forEach(ray => ray.drawRay(canvas));
+    draw2D(canvas: HTMLCanvasElement): void {
+        this.rays.forEach(ray => ray.drawRay2D(canvas));
+    }
+
+    draw3D(canvas: HTMLCanvasElement): void {
+        let raySliceWidth: number = canvas.width / this.rays.length;
+        let colCount = 0; //cols start from right at 0
+        for(let i = this.degSpread; i>=0; i--) {
+            this.rays[i].drawRay3D(canvas, raySliceWidth, colCount);
+            colCount++;
+        }
+
+        //center ray
+        this.rays[this.degSpread*2].drawRay3D(canvas, raySliceWidth, colCount);
+        colCount++;
+
+        for(let i = this.degSpread; i<this.degSpread*2; i++) {
+            this.rays[i].drawRay3D(canvas, raySliceWidth, colCount);
+            colCount++;
+        }
     }
 
 
