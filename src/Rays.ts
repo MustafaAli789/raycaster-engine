@@ -40,7 +40,7 @@ export class Rays {
     draw3D(canvas: HTMLCanvasElement): void {
         let raySliceWidth: number = canvas.width / this.rays.length;
         let colCount = 0; //cols start from right at 0
-        for(let i = this.degSpread; i>=0; i--) {
+        for(let i = this.degSpread-1; i>=0; i--) {
             this.rays[i].drawRay3D(canvas, raySliceWidth, colCount);
             colCount++;
         }

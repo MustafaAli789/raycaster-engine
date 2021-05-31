@@ -74,7 +74,9 @@ export class Ray {
 
         ctx.fillStyle = this.adjust(175, 175, 175, length/3);
         ctx.fillRect(canvas.width-((sliceCol+1)*sliceWidth), ceiling, sliceWidth, floor-ceiling);
-        ctx.fillStyle = this.adjust(96, 121, 163, length/5);
+
+        //floor shading
+        ctx.fillStyle = 'lightblue';
         ctx.fillRect(canvas.width-((sliceCol+1)*sliceWidth), floor, sliceWidth, canvas.height-floor);
     }
 }
