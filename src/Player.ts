@@ -1,4 +1,5 @@
 import { Map } from './Map';
+import { BlockType } from './BlockType';
 import { UnitVector } from './UnitVector'
 export class Player {
     xPos?: number;
@@ -7,10 +8,8 @@ export class Player {
     angularVelocity: number = 5;
     dirUVec?: UnitVector; //uses degree angle
     map?: Map;
-    width: number = 20;
-    height: number = 20;
+    rad: number = 2;
     keysState: {} = {};
-
 
     constructor(xPos: number, yPos: number, startingDirUVec: UnitVector, map: Map) {
         this.xPos= xPos;
@@ -82,32 +81,51 @@ export class Player {
 
     }
 
+    inBlock(curX: number, curY: number): boolean {
+        let cellWidth: number = this.map.getWidth() / this.map.getCols();
+        let cellHeight: number = this.map.getHeight() / this.map.getRows();
+
+        let curXBlockIndex: number = Math.ceil(curX/cellWidth)-1;
+        let curYBlockIndex: number = Math.ceil(curY/cellHeight)-1;
+        
+        return this.map.getBlocks()[curYBlockIndex][curXBlockIndex].getBlockType() === BlockType.Wall;
+    }
+
     moveForward():void {
-        this.yPos += this.velocity*this.dirUVec.getY();
-        this.xPos += this.velocity*this.dirUVec.getX();
+
+        let changeX: number = this.velocity*this.dirUVec.getX();
+        let changeY: number = this.velocity*this.dirUVec.getY();
+        
+        if (!this.inBlock(this.xPos + changeX, this.yPos + changeY)) {
+            this.yPos += this.velocity*this.dirUVec.getY();
+            this.xPos += this.velocity*this.dirUVec.getX();
+        }
     }
 
     moveBackward(): void {
-        this.yPos -= this.velocity*this.dirUVec.getY();
-        this.xPos -= this.velocity*this.dirUVec.getX();
+        let changeX: number = -this.velocity*this.dirUVec.getX();
+        let changeY: number = -this.velocity*this.dirUVec.getY();
+
+        if (!this.inBlock(this.xPos + changeX, this.yPos + changeY)) {
+            this.yPos -= this.velocity*this.dirUVec.getY();
+            this.xPos -= this.velocity*this.dirUVec.getX();
+        }       
     }
 
     draw(canvas: HTMLCanvasElement): void {
         let ctx = canvas.getContext('2d');
-        let translationX: number = (this.xPos+this.width/2);
-        let translationY: number = (this.yPos+this.height/2);
         let radAngle: number = this.dirUVec.getDirRad();
         
-        ctx.translate(translationX, translationY);
+        ctx.translate(this.xPos, this.yPos);
         ctx.rotate(radAngle);
-        ctx.translate(-translationX, -translationY);
+        ctx.translate(-this.xPos, -this.yPos);
         
-        ctx.fillRect(this.xPos, this.yPos, this.width, this.height);
+        //ctx.fillRect(this.xPos, this.yPos, this.width, this.height);
        
-        // ctx.beginPath();
-        // ctx.moveTo(translationX, translationY);
-        // ctx.lineTo(translationX+100, translationY);
-        // ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(this.xPos, this.yPos, this.rad, 0, 2 * Math.PI, false);
+        ctx.fillStyle = 'green';
+        ctx.fill();
 
         ctx.setTransform(1, 0, 0, 1, 0, 0);
     }
@@ -117,10 +135,10 @@ export class Player {
     }
 
     getXMid(): number {
-        return this.xPos+this.width/2;
+        return this.xPos;
     }
 
     getYMid(): number {
-        return this.yPos+this.height/2;
+        return this.yPos;
     }
 }

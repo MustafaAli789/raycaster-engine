@@ -33,8 +33,6 @@ const map: Map = new Map(rows, cols, width, height, mapTemplate);
 const player: Player = new Player(50, 50, new UnitVector(0), map);
 const rays: Rays = new Rays(map);
 
-//const ray: Ray = new Ray(player.getUnitVec(), map);
-
 // window.addEventListener('mousemove', (e) => {
 //     var rect = canvas.getBoundingClientRect();
 //     console.log(e.clientX - rect.left, e.clientY - rect.top);
@@ -49,7 +47,6 @@ function main(): void {
     clearCanvas(canvas);
     map.drawMap(canvas);
     player.draw(canvas);
-    //ray.drawRay(canvas, player.getXMid(), player.getYMid());
     rays.setData(player.getXMid(), player.getYMid(), player.getUnitVec());
     rays.draw(canvas);
 }
