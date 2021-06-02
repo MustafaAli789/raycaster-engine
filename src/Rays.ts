@@ -8,7 +8,7 @@ export class Rays {
     startY: number;
     map?: Map;
     centerUVec?: UnitVector;
-    degSpread: number = 60;
+    degSpread: number = 1200;
 
     constructor(map: Map) {
         this.map = map;
@@ -20,17 +20,17 @@ export class Rays {
     setData(startX: number, startY: number, centerUVec: UnitVector): void {
         for(let i =0; i < this.degSpread; i++) {
             let uVec: UnitVector = new UnitVector(centerUVec.getDirDeg());
-            uVec.updateDir(i*0.5+0.5);
-            this.rays[i].setData(startX, startY, uVec);
+            uVec.updateDir(i*0.05+0.05);
+            this.rays[i].setData(startX, startY, uVec, centerUVec, false);
         }
         for(let i =this.degSpread; i < this.degSpread*2; i++) {
             let uVec: UnitVector = new UnitVector(centerUVec.getDirDeg());
-            uVec.updateDir(-(i-this.degSpread)*0.5-0.5);
-            this.rays[i].setData(startX, startY, uVec);
+            uVec.updateDir(-(i-this.degSpread)*0.05-0.05);
+            this.rays[i].setData(startX, startY, uVec, centerUVec, false);
         }
 
         //center ray
-        this.rays[this.degSpread*2].setData(startX, startY, new UnitVector(centerUVec.getDirDeg()));
+        this.rays[this.degSpread*2].setData(startX, startY, new UnitVector(centerUVec.getDirDeg()), centerUVec, true);
     }
 
     draw2D(canvas: HTMLCanvasElement): void {

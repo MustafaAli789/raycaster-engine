@@ -4,18 +4,23 @@ import { UnitVector } from './UnitVector'
 export class Player {
     xPos?: number;
     yPos?: number;
-    velocity: number = 5;
+    velocity: number = 2;
     angularVelocity: number = 5;
     dirUVec?: UnitVector; //uses degree angle
     map?: Map;
     rad: number = 2;
     keysState: {} = {};
+    canvas3D?: HTMLCanvasElement;
+    canvas2D?: HTMLCanvasElement;
+    curMousePosX: number = 0;
 
-    constructor(xPos: number, yPos: number, startingDirUVec: UnitVector, map: Map) {
+    constructor(xPos: number, yPos: number, startingDirUVec: UnitVector, map: Map, canvas3D: HTMLCanvasElement, canvas2D: HTMLCanvasElement) {
         this.xPos= xPos;
         this.yPos = yPos;
         this.dirUVec = startingDirUVec;
         this.map = map;
+        this.canvas3D = canvas3D;
+        this.canvas2D = canvas2D;
 
         window.addEventListener('keyup', (e) => {
             switch(e.key) {
@@ -33,6 +38,10 @@ export class Player {
                     break;
             }
         });
+        
+        window.addEventListener('mousemove', (e) => {
+            this.curMousePosX = e.clientX;
+        })
 
         window.addEventListener('keydown', (e) => {
             switch(e.key) {
@@ -43,6 +52,7 @@ export class Player {
                     if (this.keysState['d'] === 1) {
                         this.dirUVec.updateDir(this.angularVelocity);
                     }
+                    this.rotateOnMousePos(this.canvas3D, true);
                     this.moveForward();
                     this.keysState['w'] = 1;
                     break;
@@ -53,6 +63,7 @@ export class Player {
                     if (this.keysState['d'] === 1) {
                         this.dirUVec.updateDir(this.angularVelocity);
                     }
+                    this.rotateOnMousePos(this.canvas3D, false);
                     this.moveBackward();
                     this.keysState['s'] = 1;
                     break;
@@ -91,6 +102,16 @@ export class Player {
         return this.map.getBlocks()[curYBlockIndex][curXBlockIndex].getBlockType() === BlockType.Wall;
     }
 
+    rotateOnMousePos(canvas: HTMLCanvasElement, dirForward: boolean):void {
+        let rect = canvas.getBoundingClientRect();
+        let xPos: number = this.curMousePosX - rect.left;
+        if (xPos < canvas.width/3) {
+            this.dirUVec.updateDir(dirForward ? -this.angularVelocity : this.angularVelocity);
+        } else if (xPos > 2*canvas.width/3) {
+            this.dirUVec.updateDir(dirForward ? this.angularVelocity : -this.angularVelocity);
+        }
+    }
+
     moveForward():void {
 
         let changeX: number = this.velocity*this.dirUVec.getX();
@@ -112,8 +133,8 @@ export class Player {
         }       
     }
 
-    draw(canvas: HTMLCanvasElement): void {
-        let ctx = canvas.getContext('2d');
+    draw2D(): void {
+        let ctx = this.canvas2D.getContext('2d');
         let radAngle: number = this.dirUVec.getDirRad();
         
         ctx.translate(this.xPos, this.yPos);
