@@ -43,9 +43,9 @@ export class Ray {
         let rayLen: number = Math.sqrt((this.startX-this.endX)**2 + (this.startY-this.endY)**2);
 
         //lin alg eqn i.e dot prod of two vecs / prod of their magniture = cos of angle between em (mag of both here is 1 tho)
-        //let cosTheta: number = this.uVecDir.getX()*this.centerUVecRef.getX()+this.uVecDir.getY()*this.centerUVecRef.getY();
+        let cosTheta: number = this.uVecDir.getX()*this.centerUVecRef.getX()+this.uVecDir.getY()*this.centerUVecRef.getY();
         
-        return rayLen;
+        return rayLen*cosTheta;
     }
 
     setData(startX: number, startY: number, uVec: UnitVector, centerUVecRef: UnitVector, isCenter: boolean): void {
@@ -91,10 +91,10 @@ export class Ray {
         if (this.isCenter) {
             ctx.fillStyle = "#FF0000";
         }
-        ctx.fillRect(canvas.width-((sliceCol+1)*sliceWidth), ceiling, sliceWidth, floor-ceiling);
+        ctx.fillRect(((sliceCol)*sliceWidth), ceiling, sliceWidth, floor-ceiling);
 
         //floor shading
         ctx.fillStyle = 'lightblue';
-        ctx.fillRect(canvas.width-((sliceCol+1)*sliceWidth), floor, sliceWidth, canvas.height-floor);
+        ctx.fillRect(((sliceCol)*sliceWidth), floor, sliceWidth, canvas.height-floor);
     }
 }

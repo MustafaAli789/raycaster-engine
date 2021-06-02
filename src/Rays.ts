@@ -8,29 +8,34 @@ export class Rays {
     startY: number;
     map?: Map;
     centerUVec?: UnitVector;
-    degSpread: number = 1200;
+    fov: number = 90;
+    distToProjection: number = 350;
 
     constructor(map: Map) {
         this.map = map;
-        for (let i =0; i<this.degSpread*2+1; i++) {
-            this.rays.push(new Ray(map));
-        }
     }
 
-    setData(startX: number, startY: number, centerUVec: UnitVector): void {
-        for(let i =0; i < this.degSpread; i++) {
-            let uVec: UnitVector = new UnitVector(centerUVec.getDirDeg());
-            uVec.updateDir(i*0.05+0.05);
-            this.rays[i].setData(startX, startY, uVec, centerUVec, false);
-        }
-        for(let i =this.degSpread; i < this.degSpread*2; i++) {
-            let uVec: UnitVector = new UnitVector(centerUVec.getDirDeg());
-            uVec.updateDir(-(i-this.degSpread)*0.05-0.05);
-            this.rays[i].setData(startX, startY, uVec, centerUVec, false);
-        }
+    //some resources used:
+    //https://stackoverflow.com/questions/24173966/raycasting-engine-rendering-creating-slight-distortion-increasing-towards-edges
+    //https://gamedev.stackexchange.com/questions/156842/how-can-i-correct-an-unwanted-fisheye-effect-when-drawing-a-scene-with-raycastin/156853#156853
+    //https://gamedev.stackexchange.com/questions/97574/how-can-i-fix-the-fisheye-distortion-in-my-raycast-renderer
+    //https://www.gamedev.net/forums/topic/272526-raycasting----fisheye-distortion/?page=1
+    //so theres two effects, one is the fisheye correction but another is the non linearity of angle increases between rays
+    setData(startX: number, startY: number, centerUVec: UnitVector, canvas: HTMLCanvasElement): void {
+        let screen_halflen: number = this.distToProjection*Math.tan(this.fov/2*Math.PI/180);
+        let seg_len: number = screen_halflen/(canvas.width/2);
 
-        //center ray
-        this.rays[this.degSpread*2].setData(startX, startY, new UnitVector(centerUVec.getDirDeg()), centerUVec, true);
+        for(let i =0; i<canvas.width; i++) {
+            let ang: number = Math.atan((seg_len*i-screen_halflen)/this.distToProjection) + centerUVec.getDirRad();
+            let uVec: UnitVector = new UnitVector(ang*180/Math.PI);
+            if (this.rays[i]) {
+                this.rays[i].setData(startX, startY, uVec, centerUVec, i === canvas.width/2 ? true: false);
+            } else {
+                let newRay: Ray = new Ray(this.map);
+                newRay.setData(startX, startY, uVec, centerUVec, i === canvas.width/2 ? true: false)
+                this.rays.push(newRay);
+            }
+        }
     }
 
     draw2D(canvas: HTMLCanvasElement): void {
@@ -40,19 +45,9 @@ export class Rays {
     draw3D(canvas: HTMLCanvasElement): void {
         let raySliceWidth: number = canvas.width / this.rays.length;
         let colCount = 0; //cols start from right at 0
-        for(let i = this.degSpread-1; i>=0; i--) {
-            this.rays[i].drawRay3D(canvas, raySliceWidth, colCount);
-            colCount++;
-        }
-
-        //center ray
-        this.rays[this.degSpread*2].drawRay3D(canvas, raySliceWidth, colCount);
-        colCount++;
-
-        for(let i = this.degSpread; i<this.degSpread*2; i++) {
-            this.rays[i].drawRay3D(canvas, raySliceWidth, colCount);
-            colCount++;
-        }
+        this.rays.forEach((ray, i) => {
+            this.rays[i].drawRay3D(canvas, raySliceWidth, i);
+        })
     }
 
 
