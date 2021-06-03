@@ -9,7 +9,7 @@ export class Rays {
     map?: Map;
     centerUVec?: UnitVector;
     fov: number = 90;
-    distToProjection: number = 350;
+    distToProjection: number = 1000;
 
     constructor(map: Map) {
         this.map = map;
@@ -22,19 +22,19 @@ export class Rays {
     //https://www.gamedev.net/forums/topic/272526-raycasting----fisheye-distortion/?page=1
     //so theres two effects, one is the fisheye correction but another is the non linearity of angle increases between rays
     setData(startX: number, startY: number, centerUVec: UnitVector, canvas: HTMLCanvasElement): void {
-        let screen_halflen: number = this.distToProjection*Math.tan(this.fov/2*Math.PI/180);
-        let seg_len: number = screen_halflen/(canvas.width/2);
-
-        for(let i =0; i<canvas.width; i++) {
-            let ang: number = Math.atan((seg_len*i-screen_halflen)/this.distToProjection) + centerUVec.getDirRad();
+        this.distToProjection = canvas.width/2/(Math.tan(this.fov/2*Math.PI/180));
+        let counter = 0;
+        for(let i =0; i<canvas.width; i += 0.5) {
+            let ang: number = Math.atan((i-canvas.width/2)/this.distToProjection) + centerUVec.getDirRad();
             let uVec: UnitVector = new UnitVector(ang*180/Math.PI);
-            if (this.rays[i]) {
-                this.rays[i].setData(startX, startY, uVec, centerUVec, i === canvas.width/2 ? true: false);
+            if (this.rays[counter]) {
+                this.rays[counter].setData(startX, startY, uVec, centerUVec, i === canvas.width/2 ? true: false);
             } else {
                 let newRay: Ray = new Ray(this.map);
                 newRay.setData(startX, startY, uVec, centerUVec, i === canvas.width/2 ? true: false)
                 this.rays.push(newRay);
             }
+            counter++;
         }
     }
 

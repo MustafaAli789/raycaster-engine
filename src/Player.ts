@@ -5,7 +5,7 @@ export class Player {
     xPos?: number;
     yPos?: number;
     velocity: number = 2;
-    angularVelocity: number = 5;
+    angularVelocity: number = 3;
     dirUVec?: UnitVector; //uses degree angle
     map?: Map;
     rad: number = 2;
