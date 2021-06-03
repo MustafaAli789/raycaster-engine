@@ -9,11 +9,14 @@ export class Ray {
     endX?: number;
     endY?: number;
     map?: Map;
-    isCenter: boolean = false;
+    canvas2D?: HTMLCanvasElement;
+    canvas3D?: HTMLCanvasElement;
     centerUVecRef?: UnitVector;
 
-    constructor(map: Map) {
+    constructor(map: Map, canvas2D: HTMLCanvasElement, canvas3D: HTMLCanvasElement) {
         this.map = map;
+        this.canvas2D = canvas2D;
+        this.canvas3D = canvas3D;
     }
 
     inBlock(curX: number, curY: number): boolean {
@@ -48,19 +51,18 @@ export class Ray {
         return rayLen*cosTheta;
     }
 
-    setData(startX: number, startY: number, uVec: UnitVector, centerUVecRef: UnitVector, isCenter: boolean): void {
+    setData(startX: number, startY: number, uVec: UnitVector, centerUVecRef: UnitVector): void {
         this.startX = startX
         this.startY = startY;
         this.uVecDir = uVec;
-        this.isCenter = isCenter;
         this.centerUVecRef = centerUVecRef;
     }
 
-    drawRay2D(canvas: HTMLCanvasElement): void {
-        let ctx = canvas.getContext('2d');
+    drawRay2D(): void {
+        let ctx = this.canvas2D.getContext('2d');
         this.calculateEnd();
 
-        if (this.isCenter) {
+        if (this.centerUVecRef.getDirRad() == this.uVecDir.getDirRad()) { //this is the center col
             ctx.strokeStyle = "#FF0000";
         } else {
             ctx.strokeStyle = "black";
@@ -79,22 +81,22 @@ export class Ray {
         return "rgb("+r+", "+g+", "+b+")";
     }
 
-    drawRay3D(canvas: HTMLCanvasElement, sliceWidth: number, sliceCol: number): void {
-        let ctx = canvas.getContext('2d');
+    drawRay3D(sliceWidth: number, sliceCol: number): void {
+        let ctx = this.canvas3D.getContext('2d');
         //this.calculateEnd();
         let length = this.getAdjustedLength();
 
-        let ceiling: number = canvas.height/2 - canvas.height/(length/12);
-        let floor: number = canvas.height - ceiling;
+        let ceiling: number = this.canvas3D.height/2 - this.canvas3D.height/(length/12);
+        let floor: number = this.canvas3D.height - ceiling;
 
         ctx.fillStyle = this.adjust(175, 175, 175, length/3);
-        if (this.isCenter) {
+        if (this.centerUVecRef.getDirRad() == this.uVecDir.getDirRad()) {
             ctx.fillStyle = "#FF0000";
         }
         ctx.fillRect(((sliceCol)*sliceWidth), ceiling, sliceWidth, floor-ceiling);
 
         //floor shading
         ctx.fillStyle = 'lightblue';
-        ctx.fillRect(((sliceCol)*sliceWidth), floor, sliceWidth, canvas.height-floor);
+        ctx.fillRect(((sliceCol)*sliceWidth), floor, sliceWidth, this.canvas3D.height-floor);
     }
 }

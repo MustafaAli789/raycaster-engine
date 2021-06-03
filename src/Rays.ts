@@ -7,12 +7,16 @@ export class Rays {
     startX?: number;
     startY: number;
     map?: Map;
-    centerUVec?: UnitVector;
+    centerUVec?: UnitVector; //i.e dir of camera
+    canvas2D?: HTMLCanvasElement;
+    canvas3D?: HTMLCanvasElement;
     fov: number = 90;
     distToProjection: number = 1000;
 
-    constructor(map: Map) {
+    constructor(map: Map, canvas2D: HTMLCanvasElement, canvas3D: HTMLCanvasElement) {
         this.map = map;
+        this.canvas2D = canvas2D;
+        this.canvas3D = canvas3D;
     }
 
     //some resources used:
@@ -21,32 +25,39 @@ export class Rays {
     //https://gamedev.stackexchange.com/questions/97574/how-can-i-fix-the-fisheye-distortion-in-my-raycast-renderer
     //https://www.gamedev.net/forums/topic/272526-raycasting----fisheye-distortion/?page=1
     //so theres two effects, one is the fisheye correction but another is the non linearity of angle increases between rays
-    setData(startX: number, startY: number, centerUVec: UnitVector, canvas: HTMLCanvasElement): void {
-        this.distToProjection = canvas.width/2/(Math.tan(this.fov/2*Math.PI/180));
+    setData(startX: number, startY: number, centerUVec: UnitVector): void {
+        this.distToProjection = this.canvas3D.width/2/(Math.tan(this.toRad(this.fov/2)));
         let counter = 0;
-        for(let i =0; i<canvas.width; i += 0.5) {
-            let ang: number = Math.atan((i-canvas.width/2)/this.distToProjection) + centerUVec.getDirRad();
-            let uVec: UnitVector = new UnitVector(ang*180/Math.PI);
+        for(let i =0; i<this.canvas3D.width; i += 0.5) {
+            let ang: number = Math.atan((i-this.canvas3D.width/2)/this.distToProjection) + centerUVec.getDirRad();
+            let uVec: UnitVector = new UnitVector(this.toDeg(ang));
             if (this.rays[counter]) {
-                this.rays[counter].setData(startX, startY, uVec, centerUVec, i === canvas.width/2 ? true: false);
+                this.rays[counter].setData(startX, startY, uVec, centerUVec);
             } else {
-                let newRay: Ray = new Ray(this.map);
-                newRay.setData(startX, startY, uVec, centerUVec, i === canvas.width/2 ? true: false)
+                let newRay: Ray = new Ray(this.map, this.canvas2D, this.canvas3D);
+                newRay.setData(startX, startY, uVec, centerUVec)
                 this.rays.push(newRay);
             }
             counter++;
         }
     }
 
-    draw2D(canvas: HTMLCanvasElement): void {
-        this.rays.forEach(ray => ray.drawRay2D(canvas));
+    toRad(deg: number): number {
+        return deg*Math.PI/180;
     }
 
-    draw3D(canvas: HTMLCanvasElement): void {
-        let raySliceWidth: number = canvas.width / this.rays.length;
-        let colCount = 0; //cols start from right at 0
+    toDeg(rad: number): number {
+        return rad/Math.PI*180;
+    }
+
+    draw2D(): void {
+        this.rays.forEach(ray => ray.drawRay2D());
+    }
+
+    draw3D(): void {
+        let raySliceWidth: number = this.canvas3D.width / this.rays.length;
         this.rays.forEach((ray, i) => {
-            this.rays[i].drawRay3D(canvas, raySliceWidth, i);
+            ray.drawRay3D(raySliceWidth, i);
         })
     }
 

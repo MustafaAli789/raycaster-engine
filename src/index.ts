@@ -31,9 +31,9 @@ let mapTemplate: BlockType[][] = [
     [BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall],
 ]
 
-const map: Map = new Map(rows, cols, widthCanvas2D, heightCanvas2D, mapTemplate);
+const map: Map = new Map(rows, cols, widthCanvas2D, heightCanvas2D, mapTemplate, canvas2D);
 const player: Player = new Player(300, 350, new UnitVector(270), map, canvas3D, canvas2D);
-const rays: Rays = new Rays(map);
+const rays: Rays = new Rays(map, canvas2D, canvas3D);
 
 // window.addEventListener('mousemove', (e) => {
 //     var rect = canvas.getBoundingClientRect();
@@ -48,11 +48,11 @@ function clearCanvas(canvas: HTMLCanvasElement): void {
 function main(): void {
     clearCanvas(canvas2D);
     clearCanvas(canvas3D);
-    map.drawMap(canvas2D);
+    map.drawMap();
     player.draw2D();
-    rays.setData(player.getXMid(), player.getYMid(), player.getUnitVec(), canvas3D);
-    rays.draw2D(canvas2D);
-    rays.draw3D(canvas3D);
+    rays.setData(player.getXMid(), player.getYMid(), player.getUnitVec());
+    rays.draw2D();
+    rays.draw3D();
 }
 
 setInterval(main, 1000/60);

@@ -8,8 +8,9 @@ export class Map {
     blocks?: Block[][];
     cellWidth?: number;
     cellHeight?: number;
+    canvas?: HTMLCanvasElement;
 
-    constructor(rows: number, cols: number, width: number, height: number, mapTemplate?: Array<Array<BlockType>>) {
+    constructor(rows: number, cols: number, width: number, height: number, mapTemplate: Array<Array<BlockType>>, canvas: HTMLCanvasElement) {
         this.rows = rows;
         this.cols = cols;
         this.height = height;
@@ -17,6 +18,7 @@ export class Map {
         this.cellHeight = height/rows; //need to be evenly div
         this.cellWidth = width/cols;
         this.blocks = new Array<Array<Block>>();
+        this.canvas = canvas;
 
         if(mapTemplate) {
             mapTemplate.forEach((row, iRow) => {
@@ -29,14 +31,14 @@ export class Map {
         }
     }
 
-    drawMap(canvas: HTMLCanvasElement): void {
-        if (canvas.height !== this.height) {
+    drawMap(): void {
+        if (this.canvas.height !== this.height) {
             throw console.error('Canvas height did not match map height');  
         }
-        if (canvas.width !== this.width) {
+        if (this.canvas.width !== this.width) {
             throw console.error('Canvas width did not match map width');  
         }
-        let context = canvas.getContext('2d');
+        let context = this.canvas.getContext('2d');
         this.blocks.forEach((row, iRow) => {
             row.forEach((block, iCol) => {
                 if (block.blockType === BlockType.Wall) {
