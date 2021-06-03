@@ -74,11 +74,10 @@ export class Ray {
         ctx.strokeStyle = "black";
     }
 
-    adjust(red: number, green: number, blue: number, amountChange: number) {
-        let r = red - amountChange;
-        let g = green - amountChange;
-        let b = blue - amountChange;
-        return "rgb("+r+", "+g+", "+b+")";
+    adjust(startColor: {r, g, b}, amountChange: number) {
+        startColor.r = Math.max(startColor.r - amountChange, 0);
+        startColor.g = Math.max(startColor.g - amountChange, 0);
+        startColor.b= Math.max(startColor.b - amountChange, 0);
     }
 
     drawRay3D(sliceWidth: number, sliceCol: number): void {
@@ -89,14 +88,38 @@ export class Ray {
         let ceiling: number = this.canvas3D.height/2 - this.canvas3D.height/(length/12);
         let floor: number = this.canvas3D.height - ceiling;
 
-        ctx.fillStyle = this.adjust(175, 175, 175, length/3);
+        let color = {r:175, g:175, b:175};
+        this.adjust(color, length/2.5)
+
+        ctx.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`
         if (this.centerUVecRef.getDirRad() == this.uVecDir.getDirRad()) {
             ctx.fillStyle = "#FF0000";
         }
         ctx.fillRect(((sliceCol)*sliceWidth), ceiling, sliceWidth, floor-ceiling);
 
-        //floor shading
-        ctx.fillStyle = 'lightblue';
-        ctx.fillRect(((sliceCol)*sliceWidth), floor, sliceWidth, this.canvas3D.height-floor);
+        //floor shading 1
+        let floorLength: number = this.canvas3D.height-floor;
+        let curColor = {r: 0, g:183, b:255};
+        let incrHeight: number = 25;
+        let incr = Math.ceil(floorLength/incrHeight);
+
+        for(let i =1; i<=incr; i++) {
+            let incrDrawStartY: number = this.canvas3D.height-i*incrHeight;
+            let incrDrawHeight: number = incrHeight;
+            if (i==incr) { //special case in case last part of floor at top isnt acc incr height pixels
+                incrDrawStartY = floor;
+                incrDrawHeight = (floorLength) % incrHeight;
+            }
+            let grd = ctx.createLinearGradient(0, incrDrawStartY+incrDrawHeight, 0, incrDrawStartY);
+            grd.addColorStop(0, `rgb(${curColor.r}, ${curColor.g}, ${curColor.b})`);
+            this.adjust(curColor, 15);
+            grd.addColorStop(1, `rgb(${curColor.r}, ${curColor.g}, ${curColor.b})`);
+            ctx.fillStyle = grd;
+            ctx.fillRect(((sliceCol)*sliceWidth), incrDrawStartY, sliceWidth, incrDrawHeight);
+        }
+
+        //floor shading 2
+        // ctx.fillStyle = 'lightblue';
+        // ctx.fillRect(((sliceCol)*sliceWidth), floor, sliceWidth, this.canvas3D.height-floor);
     }
 }
