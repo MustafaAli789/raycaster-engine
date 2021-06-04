@@ -11,7 +11,7 @@ export class Rays {
     canvas2D?: HTMLCanvasElement;
     canvas3D?: HTMLCanvasElement;
     fov: number = 90;
-    distToProjection: number = 1000;
+    distToProjection: number = 350;
 
     constructor(map: Map, canvas2D: HTMLCanvasElement, canvas3D: HTMLCanvasElement) {
         this.map = map;
@@ -28,7 +28,7 @@ export class Rays {
     setData(startX: number, startY: number, centerUVec: UnitVector): void {
         this.distToProjection = this.canvas3D.width/2/(Math.tan(this.toRad(this.fov/2)));
         let counter = 0;
-        for(let i =0; i<this.canvas3D.width; i += 0.5) {
+        for(let i =0; i<this.canvas3D.width; i += 1) {
             let ang: number = Math.atan((i-this.canvas3D.width/2)/this.distToProjection) + centerUVec.getDirRad();
             let uVec: UnitVector = new UnitVector(this.toDeg(ang));
             if (this.rays[counter]) {
