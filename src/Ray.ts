@@ -113,10 +113,13 @@ export class Ray {
         let ctx = this.canvas3D.getContext('2d');
         //this.calculateEnd();
         let length = this.getAdjustedLength();
-        let crouchingShift: number = this.playerCrouching ? -50 : 0;
 
-        let ceiling: number = this.canvas3D.height/2 - this.canvas3D.height/(length/12) + this.walkingFrameCount/10 + crouchingShift;
-        let floor: number = this.canvas3D.height - ceiling + this.walkingFrameCount/5 + crouchingShift*2;
+        let crouchingPixhift: number = this.playerCrouching ? -250 : 0;
+        let crouchingFactor: number = crouchingPixhift*(1/(length/12)); //need to factor in length of ray because clsoer stuff gets more tall than stuff thats further away
+        let walkingFactor: number = this.walkingFrameCount/10;
+
+        let ceiling: number = this.canvas3D.height/2 - this.canvas3D.height/(length/12) + walkingFactor + crouchingFactor;
+        let floor: number = this.canvas3D.height - ceiling + walkingFactor*2 + crouchingFactor*2;
 
         let color = {r:175, g:175, b:175};
         this.adjustColor(color, {r: -length/3.5, g: -length/3.5, b: -length/3.5})
