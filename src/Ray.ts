@@ -13,6 +13,9 @@ export class Ray {
     canvas3D?: HTMLCanvasElement;
     centerUVecRef?: UnitVector;
     grd?: CanvasGradient;
+    playerMoving: boolean = false;
+    walkingFrameCount: number = 0;
+    walkingFrameIncr: number = 6;
 
     constructor(map: Map, canvas2D: HTMLCanvasElement, canvas3D: HTMLCanvasElement) {
         this.map = map;
@@ -65,11 +68,22 @@ export class Ray {
         return rayLen*cosTheta;
     }
 
-    setData(startX: number, startY: number, uVec: UnitVector, centerUVecRef: UnitVector): void {
+    setData(startX: number, startY: number, uVec: UnitVector, centerUVecRef: UnitVector, playerMoving: boolean): void {
         this.startX = startX
         this.startY = startY;
         this.uVecDir = uVec;
         this.centerUVecRef = centerUVecRef;
+        this.playerMoving = playerMoving;
+
+        if (!playerMoving && this.walkingFrameCount >= 0) {
+            this.walkingFrameCount = 0;
+        } else if(this.walkingFrameCount <= 60 && this.walkingFrameCount >= 0) {
+            this.walkingFrameCount += this.walkingFrameIncr;
+        } else {
+            this.walkingFrameIncr*=-1;
+            this.walkingFrameCount += this.walkingFrameIncr;
+        }
+        //this.walkingFrameCount = this.walkingFrameCount%60;
     }
 
     drawRay2D(): void {
@@ -99,8 +113,8 @@ export class Ray {
         //this.calculateEnd();
         let length = this.getAdjustedLength();
 
-        let ceiling: number = this.canvas3D.height/2 - this.canvas3D.height/(length/12);
-        let floor: number = this.canvas3D.height - ceiling;
+        let ceiling: number = this.canvas3D.height/2 - this.canvas3D.height/(length/12) + this.walkingFrameCount/10;
+        let floor: number = this.canvas3D.height - ceiling + this.walkingFrameCount/5;
 
         let color = {r:175, g:175, b:175};
         this.adjustColor(color, {r: -length/3.5, g: -length/3.5, b: -length/3.5})

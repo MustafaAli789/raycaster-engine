@@ -25,16 +25,20 @@ export class Player {
         window.addEventListener('keyup', (e) => {
             switch(e.key) {
                 case 'w':
-                    this.keysState['w'] = 0;
+                    clearInterval(this.keysState['w']);
+                    this.keysState['w'] = null;
                     break;
                 case 's':
-                    this.keysState['s'] = 0;
+                    clearInterval(this.keysState['s']);
+                    this.keysState['s'] = null;
                     break;
                 case 'a':
-                    this.keysState['a'] = 0;
+                    clearInterval(this.keysState['a']);
+                    this.keysState['a'] = null;
                     break;
                 case 'd':
-                    this.keysState['d'] = 0;
+                    clearInterval(this.keysState['d']);
+                    this.keysState['d'] = null;
                     break;
             }
         });
@@ -46,46 +50,32 @@ export class Player {
         window.addEventListener('keydown', (e) => {
             switch(e.key) {
                 case 'w':
-                    if (this.keysState['a'] === 1) {
-                        this.dirUVec.updateDir(-this.angularVelocity);
+                    if (!this.keysState['w']) {
+                        this.keysState['w'] = setInterval(() => {
+                            this.moveForward();
+                        }, 25)
                     }
-                    if (this.keysState['d'] === 1) {
-                        this.dirUVec.updateDir(this.angularVelocity);
-                    }
-                    this.rotateOnMousePos(this.canvas3D, true);
-                    this.moveForward();
-                    this.keysState['w'] = 1;
                     break;
                 case 's':
-                    if (this.keysState['a'] === 1) {
-                        this.dirUVec.updateDir(-this.angularVelocity);
+                    if (!this.keysState['s']) {
+                        this.keysState['s'] = setInterval(() => {
+                            this.moveBackward();
+                        }, 25)
                     }
-                    if (this.keysState['d'] === 1) {
-                        this.dirUVec.updateDir(this.angularVelocity);
-                    }
-                    this.rotateOnMousePos(this.canvas3D, false);
-                    this.moveBackward();
-                    this.keysState['s'] = 1;
                     break;
                 case 'a':
-                    if (this.keysState['w'] === 1) {
-                        this.moveForward();
+                    if (!this.keysState['a']) {
+                        this.keysState['a'] = setInterval(() => {
+                            this.dirUVec.updateDir(-this.angularVelocity);
+                        }, 25)
                     }
-                    if (this.keysState['s'] === 1) {
-                        this.moveBackward();
-                    }
-                    this.dirUVec.updateDir(-this.angularVelocity);
-                    this.keysState['a'] = 1;
                     break;
                 case 'd':
-                    if (this.keysState['w'] === 1) {
-                        this.moveForward();
+                    if (!this.keysState['d']) {
+                        this.keysState['d'] = setInterval(() => {
+                            this.dirUVec.updateDir(this.angularVelocity);
+                        }, 25)
                     }
-                    if (this.keysState['s'] === 1) {
-                        this.moveBackward();
-                    }
-                    this.dirUVec.updateDir(this.angularVelocity);
-                    this.keysState['d'] = 1;
                     break;
             }
         });
@@ -102,15 +92,15 @@ export class Player {
         return this.map.getBlocks()[curYBlockIndex][curXBlockIndex].getBlockType() === BlockType.Wall;
     }
 
-    rotateOnMousePos(canvas: HTMLCanvasElement, dirForward: boolean):void {
-        let rect = canvas.getBoundingClientRect();
-        let xPos: number = this.curMousePosX - rect.left;
-        if (xPos < canvas.width/3) {
-            this.dirUVec.updateDir(dirForward ? -this.angularVelocity : this.angularVelocity);
-        } else if (xPos > 2*canvas.width/3) {
-            this.dirUVec.updateDir(dirForward ? this.angularVelocity : -this.angularVelocity);
-        }
-    }
+    // rotateOnMousePos(canvas: HTMLCanvasElement, dirForward: boolean):void {
+    //     let rect = canvas.getBoundingClientRect();
+    //     let xPos: number = this.curMousePosX - rect.left;
+    //     if (xPos < canvas.width/3) {
+    //         this.dirUVec.updateDir(dirForward ? -this.angularVelocity : this.angularVelocity);
+    //     } else if (xPos > 2*canvas.width/3) {
+    //         this.dirUVec.updateDir(dirForward ? this.angularVelocity : -this.angularVelocity);
+    //     }
+    // }
 
     moveForward():void {
 
