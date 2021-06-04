@@ -16,6 +16,7 @@ export class Ray {
     playerMoving: boolean = false;
     walkingFrameCount: number = 0;
     walkingFrameIncr: number = 6;
+    playerCrouching: boolean = false;
 
     constructor(map: Map, canvas2D: HTMLCanvasElement, canvas3D: HTMLCanvasElement) {
         this.map = map;
@@ -68,14 +69,15 @@ export class Ray {
         return rayLen*cosTheta;
     }
 
-    setData(startX: number, startY: number, uVec: UnitVector, centerUVecRef: UnitVector, playerMoving: boolean): void {
+    setData(startX: number, startY: number, uVec: UnitVector, centerUVecRef: UnitVector, playerMoving: boolean, playerCrouching: boolean): void {
         this.startX = startX
         this.startY = startY;
         this.uVecDir = uVec;
         this.centerUVecRef = centerUVecRef;
         this.playerMoving = playerMoving;
+        this.playerCrouching = playerCrouching;
 
-        if (!playerMoving && this.walkingFrameCount >= 0) {
+        if (!playerMoving) {
             this.walkingFrameCount = 0;
         } else if(this.walkingFrameCount <= 60 && this.walkingFrameCount >= 0) {
             this.walkingFrameCount += this.walkingFrameIncr;
@@ -83,7 +85,6 @@ export class Ray {
             this.walkingFrameIncr*=-1;
             this.walkingFrameCount += this.walkingFrameIncr;
         }
-        //this.walkingFrameCount = this.walkingFrameCount%60;
     }
 
     drawRay2D(): void {
@@ -112,9 +113,10 @@ export class Ray {
         let ctx = this.canvas3D.getContext('2d');
         //this.calculateEnd();
         let length = this.getAdjustedLength();
+        let crouchingShift: number = this.playerCrouching ? -50 : 0;
 
-        let ceiling: number = this.canvas3D.height/2 - this.canvas3D.height/(length/12) + this.walkingFrameCount/10;
-        let floor: number = this.canvas3D.height - ceiling + this.walkingFrameCount/5;
+        let ceiling: number = this.canvas3D.height/2 - this.canvas3D.height/(length/12) + this.walkingFrameCount/10 + crouchingShift;
+        let floor: number = this.canvas3D.height - ceiling + this.walkingFrameCount/5 + crouchingShift*2;
 
         let color = {r:175, g:175, b:175};
         this.adjustColor(color, {r: -length/3.5, g: -length/3.5, b: -length/3.5})

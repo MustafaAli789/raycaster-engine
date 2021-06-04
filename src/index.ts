@@ -50,7 +50,7 @@ function main(): void {
     clearCanvas(canvas3D);
     map.drawMap();
     player.draw2D();
-    rays.setData(player.getXMid(), player.getYMid(), player.getUnitVec(), player.keysState['w'] || player.keysState['s']);
+    rays.setData(player.getXMid(), player.getYMid(), player.getUnitVec(), player.isPlayerMoving(), player.isPlayerCrouching());
     rays.draw2D();
     rays.draw3D();
 }

@@ -4,8 +4,10 @@ import { UnitVector } from './UnitVector'
 export class Player {
     xPos?: number;
     yPos?: number;
-    velocity: number = 2;
-    angularVelocity: number = 3;
+    standingVel: number = 2;
+    crouchingVel: number = 1;
+    standingAngularVel: number = 3;
+    crouchingAngularVel: number = 1.5;
     dirUVec?: UnitVector; //uses degree angle
     map?: Map;
     rad: number = 2;
@@ -24,6 +26,9 @@ export class Player {
 
         window.addEventListener('keyup', (e) => {
             switch(e.key) {
+                case 'c':
+                    this.keysState['c'] = false;
+                    break;
                 case 'w':
                     clearInterval(this.keysState['w']);
                     this.keysState['w'] = null;
@@ -49,6 +54,9 @@ export class Player {
 
         window.addEventListener('keydown', (e) => {
             switch(e.key) {
+                case 'c':
+                    this.keysState['c'] = true;
+                    break;
                 case 'w':
                     if (!this.keysState['w']) {
                         this.keysState['w'] = setInterval(() => {
@@ -66,20 +74,28 @@ export class Player {
                 case 'a':
                     if (!this.keysState['a']) {
                         this.keysState['a'] = setInterval(() => {
-                            this.dirUVec.updateDir(-this.angularVelocity);
+                            this.rotate('LEFT');
                         }, 25)
                     }
                     break;
                 case 'd':
                     if (!this.keysState['d']) {
                         this.keysState['d'] = setInterval(() => {
-                            this.dirUVec.updateDir(this.angularVelocity);
+                            this.rotate('RIGHT');
                         }, 25)
                     }
                     break;
             }
         });
 
+    }
+
+    isPlayerMoving(): boolean {
+        return this.keysState['w'] || this.keysState['s'];
+    }
+
+    isPlayerCrouching(): boolean {
+        return this.keysState['c'];
     }
 
     inBlock(curX: number, curY: number): boolean {
@@ -102,24 +118,36 @@ export class Player {
     //     }
     // }
 
-    moveForward():void {
+    rotate(dir: string): void {
+        let vel: number = this.keysState['c'] ? this.crouchingAngularVel : this.standingAngularVel;
+        if (dir === 'LEFT') {
+            this.dirUVec.updateDir(-vel);
+        } else if(dir === 'RIGHT') {
+            this.dirUVec.updateDir(vel);
+        }
+    }
 
-        let changeX: number = this.velocity*this.dirUVec.getX();
-        let changeY: number = this.velocity*this.dirUVec.getY();
+    moveForward():void {
+        let vel: number = this.keysState['c'] ? this.crouchingVel : this.standingVel;
+
+        let changeX: number = vel*this.dirUVec.getX();
+        let changeY: number = vel*this.dirUVec.getY();
         
         if (!this.inBlock(this.xPos + changeX, this.yPos + changeY)) {
-            this.yPos += this.velocity*this.dirUVec.getY();
-            this.xPos += this.velocity*this.dirUVec.getX();
+            this.yPos += vel*this.dirUVec.getY();
+            this.xPos += vel*this.dirUVec.getX();
         }
     }
 
     moveBackward(): void {
-        let changeX: number = -this.velocity*this.dirUVec.getX();
-        let changeY: number = -this.velocity*this.dirUVec.getY();
+        let vel: number = this.keysState['c'] ? this.crouchingVel : this.standingVel;
+
+        let changeX: number = -vel*this.dirUVec.getX();
+        let changeY: number = -vel*this.dirUVec.getY();
 
         if (!this.inBlock(this.xPos + changeX, this.yPos + changeY)) {
-            this.yPos -= this.velocity*this.dirUVec.getY();
-            this.xPos -= this.velocity*this.dirUVec.getX();
+            this.yPos -= vel*this.dirUVec.getY();
+            this.xPos -= vel*this.dirUVec.getX();
         }       
     }
 
