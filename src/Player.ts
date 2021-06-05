@@ -15,14 +15,16 @@ export class Player {
     canvas3D?: HTMLCanvasElement;
     canvas2D?: HTMLCanvasElement;
     curMousePosX: number = 0;
+    audio?: HTMLAudioElement;
 
-    constructor(xPos: number, yPos: number, startingDirUVec: UnitVector, map: Map, canvas3D: HTMLCanvasElement, canvas2D: HTMLCanvasElement) {
+    constructor(xPos: number, yPos: number, startingDirUVec: UnitVector, map: Map, canvas3D: HTMLCanvasElement, canvas2D: HTMLCanvasElement, audio: HTMLAudioElement) {
         this.xPos= xPos;
         this.yPos = yPos;
         this.dirUVec = startingDirUVec;
         this.map = map;
         this.canvas3D = canvas3D;
         this.canvas2D = canvas2D;
+        this.audio = audio;
 
         window.addEventListener('keyup', (e) => {
             switch(e.key) {
@@ -30,6 +32,8 @@ export class Player {
                     this.keysState['c'] = false;
                     break;
                 case 'w':
+                    this.audio.pause();
+                    this.audio.currentTime = 0;
                     clearInterval(this.keysState['w']);
                     this.keysState['w'] = null;
                     break;
@@ -58,6 +62,7 @@ export class Player {
                     this.keysState['c'] = true;
                     break;
                 case 'w':
+                    this.audio.play();
                     if (!this.keysState['w']) {
                         this.keysState['w'] = setInterval(() => {
                             this.moveForward();
