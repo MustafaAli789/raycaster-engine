@@ -15,7 +15,7 @@ export class Ray {
     grd?: CanvasGradient;
     playerMoving: boolean = false;
     walkingFrameCount: number = 0;
-    walkingFrameIncr: number = 6;
+    walkingFrameIncr: number = 4; //formula for num of up and downs is 1/(2/walingFrameIncr)
     playerCrouching: boolean = false;
 
     constructor(map: Map, canvas2D: HTMLCanvasElement, canvas3D: HTMLCanvasElement) {
@@ -77,12 +77,14 @@ export class Ray {
         this.playerMoving = playerMoving;
         this.playerCrouching = playerCrouching;
 
+        //first normalzie walkign frame incr to 1 and then multip by factor
+        //cant just say = 3 or = 6 cause they mighta been a neg num before
         if (playerCrouching) {
             this.walkingFrameIncr = this.walkingFrameIncr/Math.abs(this.walkingFrameIncr);
-            this.walkingFrameIncr*=3;
+            this.walkingFrameIncr*=2;
         } else {
             this.walkingFrameIncr = this.walkingFrameIncr/Math.abs(this.walkingFrameIncr);
-            this.walkingFrameIncr*=6;
+            this.walkingFrameIncr*=4;
         }
 
         if (!playerMoving) {

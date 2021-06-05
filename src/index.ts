@@ -1,3 +1,4 @@
+import { AudioControl } from "./AudioContro";
 import { BlockType } from "./BlockType";
 import { Map } from "./Map";
 import { Player } from "./Player";
@@ -8,9 +9,9 @@ let canvas2D: HTMLCanvasElement = document.querySelector('#canvasLeft');
 let canvas3D: HTMLCanvasElement = document.querySelector('#canvasRight');
 
 //https://www.youtube.com/watch?v=dnRX_bHbYgs got audio from here
-let audio: HTMLAudioElement =<HTMLAudioElement>document.getElementById('audio');
-audio.playbackRate = 1.5;
-audio.loop = true;
+//audio initial values
+let audioControl: AudioControl = new AudioControl('audio');
+
 const widthCanvas2D = canvas2D.width;
 const heightCanvas2D = canvas2D.height;
 const widthCanvas3D = canvas3D.width;
@@ -37,7 +38,7 @@ let mapTemplate: BlockType[][] = [
 ]
 
 const map: Map = new Map(rows, cols, widthCanvas2D, heightCanvas2D, mapTemplate, canvas2D);
-const player: Player = new Player(300, 350, new UnitVector(270), map, canvas3D, canvas2D, audio);
+const player: Player = new Player(300, 350, new UnitVector(270), map, canvas3D, canvas2D, audioControl);
 const rays: Rays = new Rays(map, canvas2D, canvas3D);
 
 // window.addEventListener('mousemove', (e) => {
