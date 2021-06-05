@@ -77,6 +77,14 @@ export class Ray {
         this.playerMoving = playerMoving;
         this.playerCrouching = playerCrouching;
 
+        if (playerCrouching) {
+            this.walkingFrameIncr = this.walkingFrameIncr/Math.abs(this.walkingFrameIncr);
+            this.walkingFrameIncr*=3;
+        } else {
+            this.walkingFrameIncr = this.walkingFrameIncr/Math.abs(this.walkingFrameIncr);
+            this.walkingFrameIncr*=6;
+        }
+
         if (!playerMoving) {
             this.walkingFrameCount = 0;
         } else if(this.walkingFrameCount <= 60 && this.walkingFrameCount >= 0) {

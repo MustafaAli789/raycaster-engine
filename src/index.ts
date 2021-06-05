@@ -6,8 +6,10 @@ import { UnitVector } from "./UnitVector";
 
 let canvas2D: HTMLCanvasElement = document.querySelector('#canvasLeft');
 let canvas3D: HTMLCanvasElement = document.querySelector('#canvasRight');
+
+//https://www.youtube.com/watch?v=dnRX_bHbYgs got audio from here
 let audio: HTMLAudioElement =<HTMLAudioElement>document.getElementById('audio');
-audio.playbackRate = 1.7;
+audio.playbackRate = 1.5;
 audio.loop = true;
 const widthCanvas2D = canvas2D.width;
 const heightCanvas2D = canvas2D.height;

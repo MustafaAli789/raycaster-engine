@@ -4,7 +4,7 @@ import { UnitVector } from './UnitVector'
 export class Player {
     xPos?: number;
     yPos?: number;
-    standingVel: number = 2;
+    standingVel: number = 1.5;
     crouchingVel: number = 1;
     standingAngularVel: number = 3;
     crouchingAngularVel: number = 1.5;
@@ -29,6 +29,7 @@ export class Player {
         window.addEventListener('keyup', (e) => {
             switch(e.key) {
                 case 'c':
+                    this.audio.playbackRate = 2;
                     this.keysState['c'] = false;
                     break;
                 case 'w':
@@ -38,6 +39,8 @@ export class Player {
                     this.keysState['w'] = null;
                     break;
                 case 's':
+                    this.audio.pause();
+                    this.audio.currentTime = 0;
                     clearInterval(this.keysState['s']);
                     this.keysState['s'] = null;
                     break;
@@ -59,6 +62,7 @@ export class Player {
         window.addEventListener('keydown', (e) => {
             switch(e.key) {
                 case 'c':
+                    this.audio.playbackRate = 1;
                     this.keysState['c'] = true;
                     break;
                 case 'w':
@@ -70,6 +74,7 @@ export class Player {
                     }
                     break;
                 case 's':
+                    this.audio.play();
                     if (!this.keysState['s']) {
                         this.keysState['s'] = setInterval(() => {
                             this.moveBackward();
