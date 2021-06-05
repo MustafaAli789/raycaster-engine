@@ -4,7 +4,7 @@ import { UnitVector } from './UnitVector'
 import { AudioControl } from './AudioContro';
 
 enum KEYS {
-    UP = 'w', LEFT_ROTATION = 'a', DOWN = 's', RIGHT_ROTATION = 'd', CROUCH = 'ArrowDown'
+    UP = 'ArrowUp', LEFT_ROTATION = 'ArrowLeft', DOWN = 'ArrowDown', RIGHT_ROTATION = 'ArrowRight', CROUCH = 'c'
 }
 
 export class Player {
@@ -64,6 +64,7 @@ export class Player {
         })
 
         window.addEventListener('keydown', (e) => {
+            console.log(e.key)
             switch(e.key) {
                 case KEYS.CROUCH:
                     this.audioControl.setAudioCrouching();
@@ -94,6 +95,9 @@ export class Player {
                         }, 25)
                     }
                     break;
+                // case 'ArrowRight':
+                //     console.log('yee')
+                //     break;
                 case KEYS.RIGHT_ROTATION:
                     if (!this.keysState[KEYS.RIGHT_ROTATION]) {
                         this.keysState[KEYS.RIGHT_ROTATION] = setInterval(() => {
