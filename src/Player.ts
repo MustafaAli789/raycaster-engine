@@ -3,25 +3,33 @@ import { BlockType } from './BlockType';
 import { UnitVector } from './UnitVector'
 import { AudioControl } from './AudioContro';
 
+//not using WASD because it was causing problems
+//specifically when crouching + moving forward/backward and then trying to rotatae right (wouldnt rotate but for some reason rotate left worked)
 enum KEYS {
-    UP = 'ArrowUp', LEFT_ROTATION = 'ArrowLeft', DOWN = 'ArrowDown', RIGHT_ROTATION = 'ArrowRight', CROUCH = 'c'
+    UP = 'w', LEFT_ROTATION = 'a', DOWN = 's', RIGHT_ROTATION = 'd', CROUCH = 'c', RUN = ' '
 }
 
 export class Player {
     xPos?: number;
     yPos?: number;
+
     standingVel: number = 1;
     crouchingVel: number = 0.5;
+    runningVel: number = 2.25;
     standingAngularVel: number = 3;
     crouchingAngularVel: number = 1.5;
+
     dirUVec?: UnitVector; //uses degree angle
     map?: Map;
-    rad: number = 2;
+    playerCircleRadius: number = 2;
     keysState: {} = {};
     canvas3D?: HTMLCanvasElement;
     canvas2D?: HTMLCanvasElement;
-    curMousePosX: number = 0;
+    //curMousePosX: number = 0;
     audioControl?: AudioControl;
+
+    // prevTimeForwardMovePressed: number = 0;
+    // prevTimeBackwardMovePressed: number = 0;
     
     constructor(xPos: number, yPos: number, startingDirUVec: UnitVector, map: Map, canvas3D: HTMLCanvasElement, canvas2D: HTMLCanvasElement, audioControl: AudioControl) {
         this.xPos= xPos;
@@ -34,19 +42,34 @@ export class Player {
 
         window.addEventListener('keyup', (e) => {
             switch(e.key) {
+                case KEYS.RUN:
+                    //release the run key only does anything when we are cur running but not crouching
+                    //we dont want to change audio to walking when we are crouching+moving and just press and rlease the run key
+                    if(this.keysState[KEYS.RUN] && !this.keysState[KEYS.CROUCH]) { 
+                        this.audioControl.setAudioWalking();
+                        this.keysState[KEYS.RUN] = false;
+                    }
+                    break;
                 case KEYS.CROUCH:
-                    this.audioControl.setAudioWalking();
-                    this.keysState[KEYS.CROUCH] = false;
+                    //we dont want someone to press and release crouch key while running and change audio to walking
+                    if (!this.keysState[KEYS.RUN]) {
+                        this.audioControl.setAudioWalking();
+                        this.keysState[KEYS.CROUCH] = false;
+                    }
                     break;
                 case KEYS.UP:
-                    this.audioControl.stop();
-                    clearInterval(this.keysState[KEYS.UP]);
-                    this.keysState[KEYS.UP] = null;
+                    if (!this.keysState[KEYS.DOWN]) {
+                        this.audioControl.stop();
+                        clearInterval(this.keysState[KEYS.UP]);
+                        this.keysState[KEYS.UP] = null;
+                    }
                     break;
                 case KEYS.DOWN:
-                    this.audioControl.stop();
-                    clearInterval(this.keysState[KEYS.DOWN]);
-                    this.keysState[KEYS.DOWN] = null;
+                    if (!this.keysState[KEYS.UP]) {
+                        this.audioControl.stop();
+                        clearInterval(this.keysState[KEYS.DOWN]);
+                        this.keysState[KEYS.DOWN] = null;
+                    }
                     break;
                 case KEYS.LEFT_ROTATION:
                     clearInterval(this.keysState[KEYS.LEFT_ROTATION]);
@@ -59,19 +82,31 @@ export class Player {
             }
         });
         
-        window.addEventListener('mousemove', (e) => {
-            this.curMousePosX = e.clientX;
-        })
+        // window.addEventListener('mousemove', (e) => {
+        //     this.curMousePosX = e.clientX;
+        // })
 
         window.addEventListener('keydown', (e) => {
-            console.log(e.key)
             switch(e.key) {
+                case KEYS.RUN:
+                    if (!this.keysState[KEYS.CROUCH]) { //cant run when crouching
+                        this.audioControl.setAudioRunning();
+                        this.keysState[KEYS.RUN] = true;
+                    }
+                    break;
                 case KEYS.CROUCH:
-                    this.audioControl.setAudioCrouching();
-                    this.keysState[KEYS.CROUCH] = true;
+                    if (!this.keysState[KEYS.RUN]) { //cant get from running to crouch
+                        this.audioControl.setAudioCrouching();
+                        this.keysState[KEYS.CROUCH] = true;
+                    }
                     break;
                 case KEYS.UP:
-                    this.audioControl.setAudioWalking();
+                    if (this.keysState[KEYS.DOWN]) return; //cant go forward and back at same time
+                    //so if ur already crouching and then start moving, audio wont overwrite to walking standin audio
+                    //similar idea for run
+                    if (!this.keysState[KEYS.CROUCH] && !this.keysState[KEYS.RUN]) { 
+                        this.audioControl.setAudioWalking();
+                    }
                     this.audioControl.play();
                     if (!this.keysState[KEYS.UP]) {
                         this.keysState[KEYS.UP] = setInterval(() => {
@@ -79,8 +114,13 @@ export class Player {
                         }, 25)
                     }
                     break;
-                case KEYS.DOWN:
-                    this.audioControl.setAudioWalking();
+                case KEYS.DOWN: 
+                    if (this.keysState[KEYS.UP]) return; //cant go forward and back at same time
+                    //so if ur already crouching and then start moving, audio wont overwrite to walking standin audio
+                    //similar idea for run
+                    if (!this.keysState[KEYS.CROUCH] && !this.keysState[KEYS.RUN]) {
+                        this.audioControl.setAudioWalking();
+                    }
                     this.audioControl.play();
                     if (!this.keysState[KEYS.DOWN]) {
                         this.keysState[KEYS.DOWN] = setInterval(() => {
@@ -95,9 +135,6 @@ export class Player {
                         }, 25)
                     }
                     break;
-                // case 'ArrowRight':
-                //     console.log('yee')
-                //     break;
                 case KEYS.RIGHT_ROTATION:
                     if (!this.keysState[KEYS.RIGHT_ROTATION]) {
                         this.keysState[KEYS.RIGHT_ROTATION] = setInterval(() => {
@@ -148,7 +185,7 @@ export class Player {
     }
 
     moveForward():void {
-        let vel: number = this.keysState[KEYS.CROUCH] ? this.crouchingVel : this.standingVel;
+        let vel: number = this.keysState[KEYS.CROUCH] ? this.crouchingVel : (this.keysState[KEYS.RUN] ? this.runningVel : this.standingVel);
 
         let changeX: number = vel*this.dirUVec.getX();
         let changeY: number = vel*this.dirUVec.getY();
@@ -160,7 +197,7 @@ export class Player {
     }
 
     moveBackward(): void {
-        let vel: number = this.keysState[KEYS.CROUCH] ? this.crouchingVel : this.standingVel;
+        let vel: number = this.keysState[KEYS.CROUCH] ? this.crouchingVel : (this.keysState[KEYS.RUN] ? this.runningVel : this.standingVel);
 
         let changeX: number = -vel*this.dirUVec.getX();
         let changeY: number = -vel*this.dirUVec.getY();
@@ -182,7 +219,7 @@ export class Player {
         //ctx.fillRect(this.xPos, this.yPos, this.width, this.height);
        
         ctx.beginPath();
-        ctx.arc(this.xPos, this.yPos, this.rad, 0, 2 * Math.PI, false);
+        ctx.arc(this.xPos, this.yPos, this.playerCircleRadius, 0, 2 * Math.PI, false);
         ctx.fillStyle = 'green';
         ctx.fill();
 
