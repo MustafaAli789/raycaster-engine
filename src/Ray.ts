@@ -141,7 +141,7 @@ export class Ray {
         this.adjustColor(color, {r: -length/3.5, g: -length/3.5, b: -length/3.5})
 
         ctx.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`
-        if (this.centerUVecRef.getDirRad() == this.uVecDir.getDirRad()) {
+        if (Math.abs(this.centerUVecRef.getDirRad()-this.uVecDir.getDirRad()) <= 0.005) {
             ctx.fillStyle = "#FF0000";
         }
         ctx.fillRect(((sliceCol)*sliceWidth), ceiling, sliceWidth, floor-ceiling);
