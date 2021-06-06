@@ -5,9 +5,9 @@ export class AudioControl {
     volume?: number;
 
     //footstep config vars play back rate
-    walkingPlayBackRate: number = 1.2;
+    walkingPlayBackRate: number = 1;
     runningPlayBackRate: number = 2;
-    crouchingPlayBackRate: number = 0.8;
+    crouchingPlayBackRate: number = 0.7;
 
     //footstep config vars volume
     walkingVolume: number = 0.3;
