@@ -33,7 +33,7 @@ export class Ray {
 
         for(let i =0; i<numIncrs;i++) {
             this.grd.addColorStop(i*stopColorStep, `rgb(${color.r}, ${color.g}, ${color.b})`)
-            this.adjustColor(color, {r: 0, g: -colorChangePerStopColor, b: -colorChangePerStopColor*1.4});
+            this.adjustColor(color, {r: 0, g: -colorChangePerStopColor, b: -colorChangePerStopColor*1.4}); //that *1.4 is just there because to acc darken from light to dark blue to black the b part changes at a rate of 1.4
         }
     }
 
@@ -69,7 +69,7 @@ export class Ray {
         return rayLen*cosTheta;
     }
 
-    setData(startX: number, startY: number, uVec: UnitVector, centerUVecRef: UnitVector, playerMoving: boolean, playerCrouching: boolean): void {
+    setData(startX: number, startY: number, uVec: UnitVector, centerUVecRef: UnitVector, playerMoving: boolean, playerCrouching: boolean, playerRunning: boolean): void {
         this.startX = startX
         this.startY = startY;
         this.uVecDir = uVec;
@@ -77,11 +77,17 @@ export class Ray {
         this.playerMoving = playerMoving;
         this.playerCrouching = playerCrouching;
 
+        //walking frame incr controls how many pix the screen moves up and down per frame (so walking count is b/w osscilates b/w 0 and 60) while player moves
+        //so need to set it different dep on if crouching, walking or running
+
         //first normalzie walkign frame incr to 1 and then multip by factor
         //cant just say = 3 or = 6 cause they mighta been a neg num before
         if (playerCrouching) {
             this.walkingFrameIncr = this.walkingFrameIncr/Math.abs(this.walkingFrameIncr);
             this.walkingFrameIncr*=2;
+        } else if (playerRunning) {
+            this.walkingFrameIncr = this.walkingFrameIncr/Math.abs(this.walkingFrameIncr);
+            this.walkingFrameIncr*=8;
         } else {
             this.walkingFrameIncr = this.walkingFrameIncr/Math.abs(this.walkingFrameIncr);
             this.walkingFrameIncr*=4;

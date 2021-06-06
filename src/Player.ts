@@ -58,6 +58,7 @@ export class Player {
                     }
                     break;
                 case KEYS.UP:
+                    //dont want someone to press and release up while moving back and stop audio
                     if (!this.keysState[KEYS.DOWN]) {
                         this.audioControl.stop();
                         clearInterval(this.keysState[KEYS.UP]);
@@ -65,6 +66,7 @@ export class Player {
                     }
                     break;
                 case KEYS.DOWN:
+                    //dont want someone to press and release down while moving forward and stop audio
                     if (!this.keysState[KEYS.UP]) {
                         this.audioControl.stop();
                         clearInterval(this.keysState[KEYS.DOWN]);
@@ -153,6 +155,10 @@ export class Player {
 
     isPlayerCrouching(): boolean {
         return this.keysState[KEYS.CROUCH];
+    }
+
+    isPlayerRunning(): boolean {
+        return this.keysState[KEYS.RUN];
     }
 
     inBlock(curX: number, curY: number): boolean {
