@@ -62,7 +62,7 @@ export class Ray {
         let blockX = cellWidth*block.getCol();
         let blockY = cellHeight*block.getRow();
 
-        return {bottomLeft: {x: blockX, y: blockY-cellHeight}, 
+        return {bottomLeft: {x: blockX, y: blockY+cellHeight}, 
             bottomRight: {x: blockX+cellWidth, y: blockY+cellHeight}, 
             topRight: {x: blockX+cellWidth, y:blockY}, 
             topLeft: {x: blockX, y: blockY}};
@@ -71,16 +71,29 @@ export class Ray {
     checkEdgeRay(blockHit: Block): void {
         let edgeCoords = this.getEdgeCords(blockHit);
         this.edgeRay = false;
-        
-        if (Math.abs(edgeCoords.bottomLeft.x-this.endX)<=0.5 && Math.abs(edgeCoords.bottomLeft.y-this.endY)<=0.5) {
-            this.edgeRay = true;
-        } else if (Math.abs(edgeCoords.bottomRight.x-this.endX)<=0.5 && Math.abs(edgeCoords.bottomRight.y-this.endY)<=0.5) {
-            this.edgeRay = true;
-        } else if (Math.abs(edgeCoords.topRight.x-this.endX)<=0.5 && Math.abs(edgeCoords.topRight.y-this.endY)<=0.5) {
-            this.edgeRay = true;
-        } else if (Math.abs(edgeCoords.topLeft.x-this.endX)<=0.5 && Math.abs(edgeCoords.topLeft.y-this.endY)<=0.5) {
-            this.edgeRay = true; 
-        }
+
+        let startToEdgeVec: {x: number, y:number} = null;
+        let startToEdgeVecMag: number = null;
+        let angleBetweenRayAndStartToEdgeVec: number = null;
+        let distBetweenRayEndAndStartToEdgeVecEnd: number = null;
+
+        Object.keys(edgeCoords).forEach(key => {
+            startToEdgeVec = {x: edgeCoords[key].x-this.startX, y: edgeCoords[key].y-this.startY}
+            startToEdgeVecMag = Math.sqrt(startToEdgeVec.x**2 + startToEdgeVec.y**2);
+
+            //doing dot prod to get angle between ray vec nad start to edge vec
+            angleBetweenRayAndStartToEdgeVec = Math.acos((this.uVecDir.getX()*startToEdgeVec.x+this.uVecDir.getY()*startToEdgeVec.y)/(startToEdgeVecMag))*180/Math.PI;
+            
+
+            //dist formula
+            distBetweenRayEndAndStartToEdgeVecEnd = Math.sqrt((edgeCoords[key].x-this.endX)**2+(edgeCoords[key].y-this.endY)**2)
+
+            //so both the angle between the cur ray and the projected ray from endge to start has to be within a limit BUT ALSO
+            //the dist b/w end of ray and each edge has to be within a limit too
+            if (angleBetweenRayAndStartToEdgeVec<=0.1 && distBetweenRayEndAndStartToEdgeVecEnd<=3.5) {
+                this.edgeRay = true;
+            }
+        })
     }
 
     calculateEnd(): void {
@@ -182,7 +195,7 @@ export class Ray {
         this.adjustColor(color, {r: -length/3.5, g: -length/3.5, b: -length/3.5})
 
         ctx.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`
-        if (Math.abs(this.centerUVecRef.getDirRad()-this.uVecDir.getDirRad()) <= 0.005) {
+        if (Math.abs(this.centerUVecRef.getDirRad()-this.uVecDir.getDirRad()) <= 0.0075) {
             ctx.fillStyle = "#FF0000";
         } else if (this.edgeRay){
             let color = {r:125, g:125, b:125};
