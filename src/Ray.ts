@@ -229,5 +229,9 @@ export class Ray {
         //floor shading 2
         ctx.fillStyle = this.grd;
         ctx.fillRect(((sliceCol)*sliceWidth), floor, sliceWidth, this.canvas3D.height-floor);
+
+        //sky shading
+        ctx.fillStyle = 'black';
+        ctx.fillRect(((sliceCol)*sliceWidth), 0, sliceWidth, ceiling);
     }
 }
