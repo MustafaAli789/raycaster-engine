@@ -1,6 +1,7 @@
 import { UnitVector } from "./UnitVector";
 import { Map } from "./Map";
 import { BlockType } from "./BlockType";
+import { Block } from "./Block";
 
 export class Ray {
     uVecDir?: UnitVector;
@@ -12,6 +13,7 @@ export class Ray {
     canvas2D?: HTMLCanvasElement;
     canvas3D?: HTMLCanvasElement;
     centerUVecRef?: UnitVector;
+    edgeRay?: boolean;
     grd?: CanvasGradient;
     playerMoving: boolean = false;
     walkingFrameCount: number = 0;
@@ -37,14 +39,48 @@ export class Ray {
         }
     }
 
-    inBlock(curX: number, curY: number): boolean {
+    getBlock(x: number, y: number):{x: number, y: number} {
         let cellWidth: number = this.map.getWidth() / this.map.getCols();
         let cellHeight: number = this.map.getHeight() / this.map.getRows();
 
-        let curXBlockIndex: number = Math.ceil(curX/cellWidth)-1;
-        let curYBlockIndex: number = Math.ceil(curY/cellHeight)-1;
+        let curXBlockIndex: number = Math.ceil(x/cellWidth)-1;
+        let curYBlockIndex: number = Math.ceil(y/cellHeight)-1;
+
+        return {x: curXBlockIndex, y: curYBlockIndex}
+    }
+
+    inBlock(curX: number, curY: number): boolean {
+        let curBlock = this.getBlock(curX, curY);
         
-        return this.map.getBlocks()[curYBlockIndex][curXBlockIndex].getBlockType() === BlockType.Wall;
+        return this.map.getBlocks()[curBlock.y][curBlock.x].getBlockType() === BlockType.Wall;
+    }
+
+    getEdgeCords(block: Block): {bottomLeft: {x: number, y: number}, bottomRight: {x: number, y: number}, topRight: {x: number, y: number}, topLeft: {x: number, y: number}} {
+        let cellWidth: number = this.map.getWidth() / this.map.getCols();
+        let cellHeight: number = this.map.getHeight() / this.map.getRows();
+
+        let blockX = cellWidth*block.getCol();
+        let blockY = cellHeight*block.getRow();
+
+        return {bottomLeft: {x: blockX, y: blockY-cellHeight}, 
+            bottomRight: {x: blockX+cellWidth, y: blockY+cellHeight}, 
+            topRight: {x: blockX+cellWidth, y:blockY}, 
+            topLeft: {x: blockX, y: blockY}};
+    }
+
+    checkEdgeRay(blockHit: Block): void {
+        let edgeCoords = this.getEdgeCords(blockHit);
+        this.edgeRay = false;
+        
+        if (Math.abs(edgeCoords.bottomLeft.x-this.endX)<=0.5 && Math.abs(edgeCoords.bottomLeft.y-this.endY)<=0.5) {
+            this.edgeRay = true;
+        } else if (Math.abs(edgeCoords.bottomRight.x-this.endX)<=0.5 && Math.abs(edgeCoords.bottomRight.y-this.endY)<=0.5) {
+            this.edgeRay = true;
+        } else if (Math.abs(edgeCoords.topRight.x-this.endX)<=0.5 && Math.abs(edgeCoords.topRight.y-this.endY)<=0.5) {
+            this.edgeRay = true;
+        } else if (Math.abs(edgeCoords.topLeft.x-this.endX)<=0.5 && Math.abs(edgeCoords.topLeft.y-this.endY)<=0.5) {
+            this.edgeRay = true; 
+        }
     }
 
     calculateEnd(): void {
@@ -56,8 +92,13 @@ export class Ray {
             curY += this.uVecDir.getY()/4;
         }
 
+        let curBlock = this.getBlock(curX, curY);
+
         this.endX = curX;
         this.endY = curY;
+
+        let blockHit: Block = this.map.getBlocks()[curBlock.y][curBlock.x];
+        this.checkEdgeRay(blockHit);
     }
 
     getAdjustedLength(): number {
@@ -143,6 +184,10 @@ export class Ray {
         ctx.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`
         if (Math.abs(this.centerUVecRef.getDirRad()-this.uVecDir.getDirRad()) <= 0.005) {
             ctx.fillStyle = "#FF0000";
+        } else if (this.edgeRay){
+            let color = {r:125, g:125, b:125};
+            this.adjustColor(color, {r: -length/3.5, g: -length/3.5, b: -length/3.5})
+            ctx.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`;
         }
         ctx.fillRect(((sliceCol)*sliceWidth), ceiling, sliceWidth, floor-ceiling);
 

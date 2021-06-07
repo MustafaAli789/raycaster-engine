@@ -13,7 +13,7 @@ module.exports = {
             }
         ]
     },
-    resolve: {
+    resolve: { //allowing for imports
         extensions: ['.ts', '.js']
     },
     devServer: {
