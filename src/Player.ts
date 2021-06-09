@@ -14,9 +14,9 @@ export class Player {
     xPos?: number;
     yPos?: number;
 
-    standingVel: number = 1;
-    crouchingVel: number = 0.5;
-    runningVel: number = 2.25;
+    standingVel: number = 1.5;
+    crouchingVel: number = 0.75;
+    runningVel: number = 4;
     standingAngularVel: number = 3;
     crouchingAngularVel: number = 1.5;
 
@@ -43,7 +43,7 @@ export class Player {
                 case KEYS.RUN:
                     //release the run key only does anything when we are cur running but not crouching
                     //we dont want to change audio to walking when we are crouching+moving and just press and rlease the run key
-                    if(this.keysState[KEYS.RUN]) { 
+                    if(!this.keysState[KEYS.CROUCH]) { 
                         this.audioControl.setAudioWalking();
                         this.keysState[KEYS.RUN] = false;
                     }
