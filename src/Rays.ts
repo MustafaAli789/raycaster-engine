@@ -1,12 +1,12 @@
 import { Ray } from "./Ray";
-import { Map } from "./Map";
 import { UnitVector } from "./UnitVector";
+import { GameState } from "./GameState";
 
 export class Rays {
     rays: Ray[] = [];
     startX?: number;
     startY: number;
-    map?: Map;
+    gState?: GameState;
     centerUVec?: UnitVector; //i.e dir of camera
     canvas2D?: HTMLCanvasElement;
     canvas3D?: HTMLCanvasElement;
@@ -14,8 +14,8 @@ export class Rays {
     distToProjection: number = 350;
     playerMoving: boolean = false;
 
-    constructor(map: Map, canvas2D: HTMLCanvasElement, canvas3D: HTMLCanvasElement) {
-        this.map = map;
+    constructor(gState: GameState, canvas2D: HTMLCanvasElement, canvas3D: HTMLCanvasElement) {
+        this.gState = gState;
         this.canvas2D = canvas2D;
         this.canvas3D = canvas3D;
     }
@@ -26,17 +26,19 @@ export class Rays {
     //https://gamedev.stackexchange.com/questions/97574/how-can-i-fix-the-fisheye-distortion-in-my-raycast-renderer
     //https://www.gamedev.net/forums/topic/272526-raycasting----fisheye-distortion/?page=1
     //so theres two effects, one is the fisheye correction but another is the non linearity of angle increases between rays
-    setData(startX: number, startY: number, centerUVec: UnitVector, playerMoving: boolean, playerCrouching: boolean, playerRunning: boolean): void {
+    setupRays(): void {
+        let centerUVec: UnitVector = this.gState.getCenterDir();
+        
         this.distToProjection = this.canvas3D.width/2/(Math.tan(this.toRad(this.fov/2)));
         let counter = 0;
         for(let i =0; i<this.canvas3D.width; i += 1) {
             let ang: number = Math.atan((i-this.canvas3D.width/2)/this.distToProjection) + centerUVec.getDirRad();
             let uVec: UnitVector = new UnitVector(this.toDeg(ang));
             if (this.rays[counter]) {
-                this.rays[counter].setData(startX, startY, uVec, centerUVec, playerMoving, playerCrouching, playerRunning);
+                this.rays[counter].performRayCalculations(uVec);
             } else {
-                let newRay: Ray = new Ray(this.map, this.canvas2D, this.canvas3D);
-                newRay.setData(startX, startY, uVec, centerUVec, playerMoving, playerCrouching, playerRunning)
+                let newRay: Ray = new Ray(this.gState, this.canvas2D, this.canvas3D, uVec);
+                newRay.performRayCalculations(uVec);
                 this.rays.push(newRay);
             }
             counter++;

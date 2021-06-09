@@ -2,6 +2,7 @@ import { Map } from './Map';
 import { BlockType } from './BlockType';
 import { UnitVector } from './UnitVector'
 import { AudioControl } from './AudioContro';
+import {MapSizeInfo} from './MapSizeInfo.interface'
 
 //not using WASD because it was causing problems
 //specifically when crouching + moving forward/backward and then trying to rotatae right (wouldnt rotate but for some reason rotate left worked)
@@ -23,29 +24,26 @@ export class Player {
     map?: Map;
     playerCircleRadius: number = 2;
     keysState: {} = {};
-    canvas3D?: HTMLCanvasElement;
     canvas2D?: HTMLCanvasElement;
-    //curMousePosX: number = 0;
     audioControl?: AudioControl;
+    mapSizeInfo?: MapSizeInfo;
 
-    // prevTimeForwardMovePressed: number = 0;
-    // prevTimeBackwardMovePressed: number = 0;
     
-    constructor(xPos: number, yPos: number, startingDirUVec: UnitVector, map: Map, canvas3D: HTMLCanvasElement, canvas2D: HTMLCanvasElement, audioControl: AudioControl) {
+    constructor(xPos: number, yPos: number, startingDirUVec: UnitVector, map: Map, canvas2D: HTMLCanvasElement, audioControl: AudioControl, mapSizeInfo: MapSizeInfo) {
         this.xPos= xPos;
         this.yPos = yPos;
         this.dirUVec = startingDirUVec;
         this.map = map;
-        this.canvas3D = canvas3D;
         this.canvas2D = canvas2D;
         this.audioControl = audioControl;
+        this.mapSizeInfo = mapSizeInfo;
 
         window.addEventListener('keyup', (e) => {
             switch(e.key) {
                 case KEYS.RUN:
                     //release the run key only does anything when we are cur running but not crouching
                     //we dont want to change audio to walking when we are crouching+moving and just press and rlease the run key
-                    if(this.keysState[KEYS.RUN] && !this.keysState[KEYS.CROUCH]) { 
+                    if(this.keysState[KEYS.RUN]) { 
                         this.audioControl.setAudioWalking();
                         this.keysState[KEYS.RUN] = false;
                     }
@@ -162,11 +160,8 @@ export class Player {
     }
 
     inBlock(curX: number, curY: number): boolean {
-        let cellWidth: number = this.map.getWidth() / this.map.getCols();
-        let cellHeight: number = this.map.getHeight() / this.map.getRows();
-
-        let curXBlockIndex: number = Math.ceil(curX/cellWidth)-1;
-        let curYBlockIndex: number = Math.ceil(curY/cellHeight)-1;
+        let curXBlockIndex: number = Math.ceil(curX/this.mapSizeInfo.cellWidth)-1;
+        let curYBlockIndex: number = Math.ceil(curY/this.mapSizeInfo.cellHeight)-1;
         
         return this.map.getBlocks()[curYBlockIndex][curXBlockIndex].getBlockType() === BlockType.Wall;
     }
@@ -190,6 +185,7 @@ export class Player {
         }
     }
 
+    //crouching takes prio over running
     moveForward():void {
         let vel: number = this.keysState[KEYS.CROUCH] ? this.crouchingVel : (this.keysState[KEYS.RUN] ? this.runningVel : this.standingVel);
 
@@ -202,6 +198,7 @@ export class Player {
         }
     }
 
+    //crouching takes prio over running
     moveBackward(): void {
         let vel: number = this.keysState[KEYS.CROUCH] ? this.crouchingVel : (this.keysState[KEYS.RUN] ? this.runningVel : this.standingVel);
 
