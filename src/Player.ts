@@ -3,6 +3,7 @@ import { BlockType } from './BlockType';
 import { UnitVector } from './UnitVector'
 import { AudioControl } from './AudioContro';
 import {MapSizeInfo} from './MapSizeInfo.interface'
+import { Bullet } from './Bullet';
 
 //not using WASD because it was causing problems
 //specifically when crouching + moving forward/backward and then trying to rotatae right (wouldnt rotate but for some reason rotate left worked)
@@ -28,6 +29,8 @@ export class Player {
     audioControl?: AudioControl;
     mapSizeInfo?: MapSizeInfo;
 
+    bullets?: Bullet[];
+
     
     constructor(xPos: number, yPos: number, startingDirUVec: UnitVector, map: Map, canvas2D: HTMLCanvasElement, audioControl: AudioControl, mapSizeInfo: MapSizeInfo) {
         this.xPos= xPos;
@@ -37,6 +40,10 @@ export class Player {
         this.canvas2D = canvas2D;
         this.audioControl = audioControl;
         this.mapSizeInfo = mapSizeInfo;
+
+        window.addEventListener('click', () => {
+            this.bullets.push(new Bullet(this.getXMid(), this.getYMid(), this.dirUVec, this.canvas2D, this.mapSizeInfo));
+        });
 
         window.addEventListener('keyup', (e) => {
             switch(e.key) {

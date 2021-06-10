@@ -5,6 +5,7 @@ import { Map } from "./Map";
 import { UnitVector } from "./UnitVector";
 import {MapSizeInfo} from './MapSizeInfo.interface'
 import { Block } from "./Block";
+import { Bullet } from "./Bullet";
 
 
 export class GameState {
@@ -60,6 +61,9 @@ export class GameState {
     drawPlayer(): void {
         this.player.draw2D();
     }
+
+    //Updating bullets
+    
 
 
 }
