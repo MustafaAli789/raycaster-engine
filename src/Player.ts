@@ -29,7 +29,7 @@ export class Player {
     audioControl?: AudioControl;
     mapSizeInfo?: MapSizeInfo;
 
-    bullets?: Bullet[];
+    bullets: Bullet[] = [];
 
     
     constructor(xPos: number, yPos: number, startingDirUVec: UnitVector, map: Map, canvas2D: HTMLCanvasElement, audioControl: AudioControl, mapSizeInfo: MapSizeInfo) {
@@ -42,7 +42,8 @@ export class Player {
         this.mapSizeInfo = mapSizeInfo;
 
         window.addEventListener('click', () => {
-            this.bullets.push(new Bullet(this.getXMid(), this.getYMid(), this.dirUVec, this.canvas2D, this.mapSizeInfo));
+            let uVec: UnitVector = new UnitVector(this.dirUVec.getDirDeg());
+            this.bullets.push(new Bullet(this.getXMid(), this.getYMid(), uVec, this.canvas2D, this.mapSizeInfo));
         });
 
         window.addEventListener('keyup', (e) => {
@@ -171,6 +172,16 @@ export class Player {
         let curYBlockIndex: number = Math.ceil(curY/this.mapSizeInfo.cellHeight)-1;
         
         return this.map.getBlocks()[curYBlockIndex][curXBlockIndex].getBlockType() === BlockType.Wall;
+    }
+
+    getBullets(): Bullet[] {
+        return this.bullets;
+    }
+    setBullets(bullets: Bullet[]): void {
+        this.bullets = bullets;
+    }
+    removeBullets(index: number): void {
+        this.bullets.splice(index, 1);
     }
 
     // rotateOnMousePos(canvas: HTMLCanvasElement, dirForward: boolean):void {

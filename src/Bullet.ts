@@ -9,7 +9,7 @@ export class Bullet {
     uVecDir?: UnitVector;
     velocity: number = 5;
     canvas2D?: HTMLCanvasElement;
-    dim: number = 5; //i.e square side length
+    dim: number = 10; //i.e square side length
     mapSizeInfo?: MapSizeInfo;
     
 
@@ -37,7 +37,7 @@ export class Bullet {
         let midY: number = this.yPos+this.dim/2;
 
         //checking left side
-        let curX: number = midX - this.dim/2 - 0.5;
+        let curX: number = midX - this.dim/2 - 0.1;
         let curY: number = midY;
 
         if (map.getBlocks()[this.getCurBlock(curX, curY).y][this.getCurBlock(curX, curY).x].getBlockType() === BlockType.Wall) {
@@ -45,7 +45,7 @@ export class Bullet {
         }
 
         //right side
-        curX = midX + this.dim/2 + 0.5;
+        curX = midX + this.dim/2 + 0.1;
         curY = midY;
 
         if (map.getBlocks()[this.getCurBlock(curX, curY).y][this.getCurBlock(curX, curY).x].getBlockType() === BlockType.Wall) {
@@ -54,7 +54,7 @@ export class Bullet {
 
         //top side
         curX = midX;
-        curY = midY + this.dim/2 + 0.5;
+        curY = midY - this.dim/2 - 0.1;
 
         if (map.getBlocks()[this.getCurBlock(curX, curY).y][this.getCurBlock(curX, curY).x].getBlockType() === BlockType.Wall) {
             return true;
@@ -62,7 +62,7 @@ export class Bullet {
 
         //bottom side
         curX = midX;
-        curY = midY - this.dim/2 - 0.5;
+        curY = midY + this.dim/2 + 0.1;
 
         if (map.getBlocks()[this.getCurBlock(curX, curY).y][this.getCurBlock(curX, curY).x].getBlockType() === BlockType.Wall) {
             return true;
@@ -84,7 +84,8 @@ export class Bullet {
         ctx.rotate(this.uVecDir.getDirRad());
         ctx.translate(-midX, -midY);
 
-        ctx.fillRect(this.xPos, this.yPos, this.xPos+this.dim, this.yPos+this.dim);
+        ctx.fillRect(this.xPos, this.yPos, this.dim, this.dim);
+        ctx.resetTransform()
     }
 
 

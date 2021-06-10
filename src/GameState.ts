@@ -63,7 +63,20 @@ export class GameState {
     }
 
     //Updating bullets
-    
+    updateBullets():void {
+        let bullets: Bullet[] = this.player.getBullets().slice(0);
+
+        bullets.forEach((bullet, i) => {
+            bullet.moveBullet();
+            if (bullet.checkInBlock(this.map)) {
+                this.player.removeBullets(i);
+            }
+        });
+    }
+
+    drawBullets(): void {
+        this.player.getBullets().forEach(bullet => bullet.draw2D())
+    }
 
 
 }

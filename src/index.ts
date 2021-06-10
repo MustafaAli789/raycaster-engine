@@ -48,8 +48,10 @@ function main(): void {
     clearCanvas(canvas3D);
     GState.drawMap();
     GState.drawPlayer();
+    GState.updateBullets();
     rays.setupRays();
     rays.draw2D();
+    GState.drawBullets();
     rays.draw3D();
 }
 
