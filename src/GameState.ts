@@ -7,6 +7,12 @@ import {MapSizeInfo} from './MapSizeInfo.interface'
 import { Block } from "./Block";
 import { Bullet } from "./Bullet";
 
+enum ObjectHit {
+    Player,
+    Wall,
+    Ray,
+    None
+}
 
 export class GameState {
     
@@ -68,7 +74,7 @@ export class GameState {
 
         bullets.forEach((bullet, i) => {
             bullet.moveBullet();
-            if (bullet.checkInBlock(this.map)) {
+            if (bullet.checkObjectHit(this.map) === ObjectHit.Wall) {
                 this.player.removeBullets(i);
             }
         });
