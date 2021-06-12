@@ -68,8 +68,8 @@ export class GameState {
         this.player.draw2D();
     }
 
-    //Updating bullets
-    updateBullets():void {
+    //Updating and drawing bullets
+    updateAndDrawBullets():void {
         let bullets: Bullet[] = this.player.getBullets().slice(0);
 
         bullets.forEach((bullet, i) => {
@@ -78,11 +78,14 @@ export class GameState {
                 this.player.removeBullets(i);
             }
         });
+
+        //gonna draw even after collision
+        bullets.forEach(bullet => bullet.draw2D())
     }
 
-    drawBullets(): void {
-        this.player.getBullets().forEach(bullet => bullet.draw2D())
-    }
+    // drawBullets(): void {
+    //     this.player.getBullets().forEach(bullet => bullet.draw2D())
+    // }
 
 
 }

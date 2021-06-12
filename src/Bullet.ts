@@ -14,15 +14,15 @@ export class Bullet {
     xPos?: number;
     yPos?: number;
     uVecDir?: UnitVector;
-    velocity: number = 0.5;
+    velocity: number = 5;
     canvas2D?: HTMLCanvasElement;
-    dim: number = 30; //i.e square side length
+    dim: number = 10; //i.e square side length
     mapSizeInfo?: MapSizeInfo;
     
 
     constructor(startX: number, startY: number, uVecDir: UnitVector, canvas2D: HTMLCanvasElement, mapSizeInfo: MapSizeInfo){
-        this.xPos = startX;
-        this.yPos = startY;
+        this.xPos = startX-this.dim/2; //center bullet around player
+        this.yPos = startY-this.dim/2; //center bullet around player
         this.uVecDir = uVecDir;
         this.canvas2D = canvas2D;
         this.mapSizeInfo = mapSizeInfo;
@@ -86,7 +86,7 @@ export class Bullet {
 
             curPoint = this.pointAfterRotation(this.xPos+i*space, inverseY, uVec.getDirRad(), midX, midY);
             projX = curPoint.x + uVec.getX()*projMag;
-            projY = (mapHeight-curPoint.y) + uVec.getY()*projMag;
+            projY = (mapHeight-curPoint.y) + uVec.getY()*projMag; //re inv y so it follows canvas convention
 
             if (map.getBlocks()[this.getCurBlock(projX, projY).y][this.getCurBlock(projX, projY).x].getBlockType() === BlockType.Wall) {
                 return ObjectHit.Wall;
