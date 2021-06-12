@@ -84,8 +84,8 @@ export class GameState {
     }
 
     getAllBullets(): Bullet[] {
-        let bullets: Bullet[] = this.player.getBullets().slice(0);
-        return bullets;
+        //let bullets: Bullet[] = this.player.getBullets().slice(0);
+        return this.player.getBullets();
     }
 
     // drawBullets(): void {

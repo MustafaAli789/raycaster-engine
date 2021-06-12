@@ -16,7 +16,7 @@ export class Bullet {
     xPos?: number;
     yPos?: number;
     uVecDir?: UnitVector;
-    velocity: number = 5;
+    velocity: number = 0;
     canvas2D?: HTMLCanvasElement;
     dim: number = 10; //i.e square side length
     mapSizeInfo?: MapSizeInfo;
@@ -95,10 +95,6 @@ export class Bullet {
         return ObjectHit.None;
     }
 
-    //look into checking with dir of unit vector
-    //can then rotate unit vec 90 deg to elft and right and 180 deg to opp side to check all 4 sides
-    //this will take into account the actual rotation of the thing
-    //better to do  hit points on each side instead of one at the middle
     checkObjectHit(map: Map, mapSizeInfo: MapSizeInfo): ObjectHit {
 
         if(this.checkIfBulletSideInObject('FORWARD', map, mapSizeInfo) === ObjectHit.Wall) {
@@ -115,47 +111,6 @@ export class Bullet {
         }
 
         return ObjectHit.None;
-        // this.checkIfBulletSideInObject('LEFT', map);
-        // this.checkIfBulletSideInObject('RIGHT', map);
-        // this.checkIfBulletSideInObject('BOTTOM', map);
-
-
-        // let midX: number = this.xPos+this.dim/2;
-        // let midY: number = this.yPos+this.dim/2;
-
-        // //checking left side
-        // let curX: number = midX - this.dim/2 - 0.01;
-        // let curY: number = midY;
-
-        // if (map.getBlocks()[this.getCurBlock(curX, curY).y][this.getCurBlock(curX, curY).x].getBlockType() === BlockType.Wall) {
-        //     return true;
-        // }
-
-        // //right side
-        // curX = midX + this.dim/2 + 0.01;
-        // curY = midY;
-
-        // if (map.getBlocks()[this.getCurBlock(curX, curY).y][this.getCurBlock(curX, curY).x].getBlockType() === BlockType.Wall) {
-        //     return true;
-        // }
-
-        // //top side
-        // curX = midX;
-        // curY = midY - this.dim/2 - 0.01;
-
-        // if (map.getBlocks()[this.getCurBlock(curX, curY).y][this.getCurBlock(curX, curY).x].getBlockType() === BlockType.Wall) {
-        //     return true;
-        // }
-
-        // //bottom side
-        // curX = midX;
-        // curY = midY + this.dim/2 + 0.01;
-
-        // if (map.getBlocks()[this.getCurBlock(curX, curY).y][this.getCurBlock(curX, curY).x].getBlockType() === BlockType.Wall) {
-        //     return true;
-        // }
-
-        // return false;
     }
 
     draw2D(): void {
@@ -175,7 +130,7 @@ export class Bullet {
         ctx.resetTransform()
     }
 
-    //includes rotation
+    //accounts for rotation
     getBoundingBox(mapSizeInfo: MapSizeInfo): Rectangle {
 
         let mapHeight: number = mapSizeInfo.cellHeight*mapSizeInfo.rows;
@@ -187,16 +142,16 @@ export class Bullet {
         let midY: number = inverseY - this.dim/2;
 
         let A: {x: number, y: number} = this.pointAfterRotation(this.xPos, inverseY, this.uVecDir.getDirRad(), midX, midY)
-        A.y = (inverseY - A.y);
+        A.y = (mapHeight - A.y);
 
         let B: {x: number, y: number} = this.pointAfterRotation(this.xPos+this.dim, inverseY, this.uVecDir.getDirRad(), midX, midY)
-        A.y = (inverseY - A.y);
+        B.y = (mapHeight - B.y);
 
-        let C: {x: number, y: number} = this.pointAfterRotation(this.xPos, inverseY-this.dim, this.uVecDir.getDirRad(), midX, midY)
-        A.y = (inverseY - A.y);
+        let D: {x: number, y: number} = this.pointAfterRotation(this.xPos, inverseY-this.dim, this.uVecDir.getDirRad(), midX, midY)
+        D.y = (mapHeight - D.y);
 
-        let D: {x: number, y: number} = this.pointAfterRotation(this.xPos+this.dim, inverseY-this.dim, this.uVecDir.getDirRad(), midX, midY)
-        A.y = (inverseY - A.y);
+        let C: {x: number, y: number} = this.pointAfterRotation(this.xPos+this.dim, inverseY-this.dim, this.uVecDir.getDirRad(), midX, midY)
+        C.y = (mapHeight - C.y);
 
 
         return {

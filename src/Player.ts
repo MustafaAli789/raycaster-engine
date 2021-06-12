@@ -4,6 +4,7 @@ import { UnitVector } from './UnitVector'
 import { AudioControl } from './AudioContro';
 import {MapSizeInfo} from './MapSizeInfo.interface'
 import { Bullet } from './Bullet';
+import { Util } from './Util'
 
 //not using WASD because it was causing problems
 //specifically when crouching + moving forward/backward and then trying to rotatae right (wouldnt rotate but for some reason rotate left worked)
@@ -30,6 +31,8 @@ export class Player {
     mapSizeInfo?: MapSizeInfo;
 
     bullets: Bullet[] = [];
+
+    util: Util = new Util();
 
     
     constructor(xPos: number, yPos: number, startingDirUVec: UnitVector, map: Map, canvas2D: HTMLCanvasElement, audioControl: AudioControl, mapSizeInfo: MapSizeInfo) {
@@ -167,13 +170,6 @@ export class Player {
         return this.keysState[KEYS.RUN];
     }
 
-    inBlock(curX: number, curY: number): boolean {
-        let curXBlockIndex: number = Math.ceil(curX/this.mapSizeInfo.cellWidth)-1;
-        let curYBlockIndex: number = Math.ceil(curY/this.mapSizeInfo.cellHeight)-1;
-        
-        return this.map.getBlocks()[curYBlockIndex][curXBlockIndex].getBlockType() === BlockType.Wall;
-    }
-
     getBullets(): Bullet[] {
         return this.bullets;
     }
@@ -210,7 +206,7 @@ export class Player {
         let changeX: number = vel*this.dirUVec.getX();
         let changeY: number = vel*this.dirUVec.getY();
         
-        if (!this.inBlock(this.xPos + changeX, this.yPos + changeY)) {
+        if (!this.util.inMapBlock(this.xPos + changeX, this.yPos + changeY, this.mapSizeInfo, this.map)) {
             this.yPos += vel*this.dirUVec.getY();
             this.xPos += vel*this.dirUVec.getX();
         }
@@ -223,7 +219,7 @@ export class Player {
         let changeX: number = -vel*this.dirUVec.getX();
         let changeY: number = -vel*this.dirUVec.getY();
 
-        if (!this.inBlock(this.xPos + changeX, this.yPos + changeY)) {
+        if (!this.util.inMapBlock(this.xPos + changeX, this.yPos + changeY, this.mapSizeInfo, this.map)) {
             this.yPos -= vel*this.dirUVec.getY();
             this.xPos -= vel*this.dirUVec.getX();
         }       

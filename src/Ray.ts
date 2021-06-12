@@ -26,6 +26,7 @@ export class Ray {
     //if these aren not null/undefined, it means a bullet was hit along the way
     bulletHitEndX?: number;
     bulletHitEndY?: number;
+    lengthToBullet?: number;
 
     constructor(gState: GameState, canvas2D: HTMLCanvasElement, canvas3D: HTMLCanvasElement, uVecDir: UnitVector) {
         this.gState = gState;
@@ -92,13 +93,24 @@ export class Ray {
         let curX: number = this.gState.getCenterX();
         let curY: number = this.gState.getCenterY();
 
+        this.bulletHitEndX = null;
+        this.bulletHitEndY = null;
+
         let bullets: Bullet[] = this.gState.getAllBullets();
 
         while (!this.util.inMapBlock(curX, curY, this.gState.getMapSizeInfo(), this.gState.getMap())) {
 
-            // bullets.forEach(bullet => {
-                
-            // })
+            if (!this.bulletHitEndX && !this.bulletHitEndY) {
+                for (let i =0; i<bullets.length; i++) {
+                    let bullet: Bullet = bullets[i];
+                    let boundingBox: Rectangle = bullet.getBoundingBox(this.gState.getMapSizeInfo());
+                    if (this.util.pointInRectangle({x: curX, y: curY}, boundingBox)) {
+                        this.bulletHitEndX = curX;
+                        this.bulletHitEndY = curY;
+                        break;
+                    }
+                }
+            }
 
             curX += this.uVecDir.getX()/8;
             curY += this.uVecDir.getY()/8;
@@ -112,8 +124,8 @@ export class Ray {
         this.checkEdgeRay(blockHit);
     }
 
-    getAdjustedLength(): number {
-        let rayLen: number = Math.sqrt((this.gState.getCenterX()-this.endX)**2 + (this.gState.getCenterY()-this.endY)**2);
+    getAdjustedLength(endX: number, endY:number): number {
+        let rayLen: number = Math.sqrt((this.gState.getCenterX()-endX)**2 + (this.gState.getCenterY()-endY)**2);
 
         //lin alg eqn i.e dot prod of two vecs / prod of their magniture = cos of angle between em (mag of both here is 1 tho)
         let cosTheta: number = this.uVecDir.getX()*this.gState.getCenterDir().getX()+this.uVecDir.getY()*this.gState.getCenterDir().getY();
@@ -126,7 +138,11 @@ export class Ray {
         this.uVecDir = newUVecDir;
 
         this.calculateCollisionsAndIfEdge();
-        this.length = this.getAdjustedLength();
+        this.length = this.getAdjustedLength(this.endX, this.endY);
+        
+        if (this.bulletHitEndX && this.bulletHitEndY){
+            this.lengthToBullet = Math.sqrt((this.gState.getCenterX()-this.bulletHitEndX)**2 + (this.gState.getCenterY()-this.bulletHitEndY)**2);
+        }
 
         //walking frame incr controls how many pix the screen moves up and down per frame (so walking count is b/w osscilates b/w 0 and 60) while player moves
         //so need to set it different dep on if crouching, walking or running
@@ -164,7 +180,17 @@ export class Ray {
         }
         ctx.beginPath();
         ctx.moveTo(this.gState.getCenterX(), this.gState.getCenterY());
-        ctx.lineTo(this.endX, this.endY);
+
+        if(this.bulletHitEndX && this.bulletHitEndY) {
+            ctx.strokeStyle = 'blue';
+            ctx.lineTo(this.bulletHitEndX, this.bulletHitEndY);
+            ctx.stroke();
+            ctx.strokeStyle = 'green';
+            ctx.lineTo(this.endX, this.endY);
+        } else {
+            ctx.lineTo(this.endX, this.endY);
+        }
+
         ctx.stroke();
         ctx.strokeStyle = "black";
     }
@@ -187,6 +213,8 @@ export class Ray {
         let ceiling: number = this.canvas3D.height/2 - this.canvas3D.height/(this.length/12) + walkingFactor + crouchingFactor;
         let floor: number = this.canvas3D.height - ceiling + walkingFactor*2 + crouchingFactor*2;
 
+        let distFromCeilToFloor: number = floor-ceiling;
+
         //wall shading based on ray length
         let color = {r:175, g:175, b:175};
         this.adjustColor(color, {r: -this.length/3.5, g: -this.length/3.5, b: -this.length/3.5})
@@ -195,7 +223,7 @@ export class Ray {
 
         //coloring center col and edge cols differently
         if (Math.abs(this.gState.getCenterDir().getDirRad()-this.uVecDir.getDirRad()) <= 0.0075) {
-            ctx.fillStyle = "#FF0000";
+            //dctx.fillStyle = "#FF0000";
         } else if (this.edgeRay){
             let color = {r:125, g:125, b:125};
             this.adjustColor(color, {r: -this.length/3.5, g: -this.length/3.5, b: -this.length/3.5})
@@ -203,7 +231,8 @@ export class Ray {
         }
 
         //WALL COLUMN
-        ctx.fillRect(((sliceCol)*sliceWidth), ceiling, sliceWidth, floor-ceiling);
+        ctx.fillRect(((sliceCol)*sliceWidth), ceiling, sliceWidth, distFromCeilToFloor);
+
 
         //FLOOR COLUMN
         ctx.fillStyle = this.grd;
@@ -212,5 +241,24 @@ export class Ray {
         //SKY COLUMN
         ctx.fillStyle = 'black';
         ctx.fillRect(((sliceCol)*sliceWidth), 0, sliceWidth, ceiling);
+
+        //calcualting bullet ceil and floor if bullet in ray viewa
+        if (this.bulletHitEndX && this.bulletHitEndY) {
+            // let bulletCeil: number = floor/2 - floor/(this.lengthToBullet/10)
+            // let bulletFloor: number = floor - bulletCeil;
+
+            let mid:number = (floor-ceiling)/2+ceiling;
+            let bulletCeil = mid - this.canvas3D.height/(this.lengthToBullet/2)
+            let bulletFloor = mid+(mid-bulletCeil)
+
+            //wall shading based on ray lengthdddddddd
+            let color = {r: 0, g:183, b:255};
+            this.adjustColor(color, {r: 0, g: -this.lengthToBullet/0.5, b: -((this.lengthToBullet/0.5)*1.4)})
+
+            ctx.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`
+            ctx.fillRect(((sliceCol)*sliceWidth), bulletCeil, sliceWidth, bulletFloor-bulletCeil);
+
+        }
+
     }
 }

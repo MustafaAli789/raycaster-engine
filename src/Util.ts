@@ -7,7 +7,6 @@ interface Point {
     x: number, y: number
 }
 
-
 interface Vector {
     x: number, y: number
 }
@@ -15,6 +14,9 @@ interface Vector {
 export class Util {
     constructor(){}
 
+    //algo from the followin resources: 
+    //https://math.stackexchange.com/questions/2157931/how-to-check-if-a-point-is-inside-a-square-2d-plane
+    //https://stackoverflow.com/questions/2752725/finding-whether-a-point-lies-inside-a-rectangle-or-not/37865332#37865332
     pointInRectangle(m: Point, r: Rectangle): boolean {
         var AB: Vector = this.vector(r.A, r.B);
         var AM: Vector = this.vector(r.A, m);
