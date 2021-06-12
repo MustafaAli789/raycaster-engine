@@ -1,6 +1,7 @@
 import { Ray } from "./Ray";
 import { UnitVector } from "./UnitVector";
 import { GameState } from "./GameState";
+import { Util } from './Util'
 
 export class Rays {
     rays: Ray[] = [];
@@ -13,6 +14,8 @@ export class Rays {
     fov: number = 90;
     distToProjection: number = 350;
     playerMoving: boolean = false;
+
+    util: Util = new Util();
 
     constructor(gState: GameState, canvas2D: HTMLCanvasElement, canvas3D: HTMLCanvasElement) {
         this.gState = gState;
@@ -29,11 +32,11 @@ export class Rays {
     setupRays(): void {
         let centerUVec: UnitVector = this.gState.getCenterDir();
         
-        this.distToProjection = this.canvas3D.width/2/(Math.tan(this.toRad(this.fov/2)));
+        this.distToProjection = this.canvas3D.width/2/(Math.tan(this.util.toRad(this.fov/2)));
         let counter = 0;
         for(let i =0; i<this.canvas3D.width; i += 1) {
             let ang: number = Math.atan((i-this.canvas3D.width/2)/this.distToProjection) + centerUVec.getDirRad();
-            let uVec: UnitVector = new UnitVector(this.toDeg(ang));
+            let uVec: UnitVector = new UnitVector(this.util.toDeg(ang));
             if (this.rays[counter]) {
                 this.rays[counter].performRayCalculations(uVec);
             } else {
@@ -43,14 +46,6 @@ export class Rays {
             }
             counter++;
         }
-    }
-
-    toRad(deg: number): number {
-        return deg*Math.PI/180;
-    }
-
-    toDeg(rad: number): number {
-        return rad/Math.PI*180;
     }
 
     draw2D(): void {

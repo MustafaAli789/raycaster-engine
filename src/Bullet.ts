@@ -2,6 +2,7 @@ import { BlockType } from "./BlockType";
 import { Map } from "./Map";
 import { MapSizeInfo } from "./MapSizeInfo.interface";
 import { UnitVector } from "./UnitVector";
+import { Util } from './Util'
 
 enum ObjectHit {
     Player,
@@ -18,6 +19,8 @@ export class Bullet {
     canvas2D?: HTMLCanvasElement;
     dim: number = 10; //i.e square side length
     mapSizeInfo?: MapSizeInfo;
+
+    util: Util = new Util();
     
 
     constructor(startX: number, startY: number, uVecDir: UnitVector, canvas2D: HTMLCanvasElement, mapSizeInfo: MapSizeInfo){
@@ -33,12 +36,7 @@ export class Bullet {
         this.yPos += this.velocity*this.uVecDir.getY();
     }
 
-    getCurBlock(curX: number, curY: number): {x: number, y: number} {
-        let curXBlockIndex: number = Math.ceil(curX/this.mapSizeInfo.cellWidth)-1;
-        let curYBlockIndex: number = Math.ceil(curY/this.mapSizeInfo.cellHeight)-1;
-        return {x: curXBlockIndex, y: curYBlockIndex};
-    }
-
+    //this algo expects the y to be relative to origin at bottom left
     pointAfterRotation(unRotatedX: number, unRotatedY: number, clockWiseRotation: number, centerOfRotX: number, centerOfRotY: number): {x: number, y: number} {
         let newX: number = (unRotatedX-centerOfRotX)*Math.cos(-clockWiseRotation)-(unRotatedY-centerOfRotY)*Math.sin(-clockWiseRotation)+centerOfRotX;
         let newY: number = (unRotatedX-centerOfRotX)*Math.sin(-clockWiseRotation)+(unRotatedY-centerOfRotY)*Math.cos(-clockWiseRotation)+centerOfRotY;
@@ -88,7 +86,7 @@ export class Bullet {
             projX = curPoint.x + uVec.getX()*projMag;
             projY = (mapHeight-curPoint.y) + uVec.getY()*projMag; //re inv y so it follows canvas convention
 
-            if (map.getBlocks()[this.getCurBlock(projX, projY).y][this.getCurBlock(projX, projY).x].getBlockType() === BlockType.Wall) {
+            if (this.util.inMapBlock(projX, projY, mapSizeInfo, map)) {
                 return ObjectHit.Wall;
             }
         }

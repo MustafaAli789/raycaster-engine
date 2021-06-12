@@ -1,3 +1,7 @@
+import { BlockType } from "./BlockType";
+import { Map } from "./Map";
+import { MapSizeInfo } from "./MapSizeInfo.interface";
+
 interface Point {
     x: number, y: number
 }
@@ -28,14 +32,36 @@ export class Util {
         return 0 <= dotABAM && dotABAM <= dotABAB && 0 <= dotBCBM && dotBCBM <= dotBCBC;
     }
     
-    vector(p1, p2): Vector {
+    vector(p1: Point, p2: Point): Vector {
         return {
                 x: (p2.x - p1.x),
                 y: (p2.y - p1.y)
         };
     }
+
+    toRad(deg: number): number {
+        return deg*Math.PI/180;
+    }
+
+    toDeg(rad: number): number {
+        return rad/Math.PI*180;
+    }
     
-    dot(u, v): number {
+    dot(u: Vector, v: Vector): number {
         return u.x * v.x + u.y * v.y; 
+    }
+
+    getMapBlockFromCoord(x: number, y: number, mapSizeInfo: MapSizeInfo): Point {
+        let cellWidth: number = mapSizeInfo.cellWidth;
+        let cellHeight: number = mapSizeInfo.cellHeight;
+
+        let curXBlockIndex: number = Math.ceil(x/cellWidth)-1;
+        let curYBlockIndex: number = Math.ceil(y/cellHeight)-1;
+
+        return {x: curXBlockIndex, y: curYBlockIndex}
+    }
+
+    inMapBlock(x: number, y: number, mapSizeInfo: MapSizeInfo, map: Map): boolean {
+        return map.getBlocks()[this.getMapBlockFromCoord(x, y, mapSizeInfo).y][this.getMapBlockFromCoord(x, y, mapSizeInfo).x].getBlockType() === BlockType.Wall;
     }
 }

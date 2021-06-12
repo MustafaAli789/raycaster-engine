@@ -56,8 +56,8 @@ export class GameState {
     getMapSizeInfo(): MapSizeInfo {
         return this.mapSizeInfo;
     }
-    getMapBlocks(): Block[][] {
-        return this.map.blocks;
+    getMap(): Map {
+        return this.map;
     }
 
     //Drawing

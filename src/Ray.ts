@@ -3,6 +3,7 @@ import { Map } from "./Map";
 import { BlockType } from "./BlockType";
 import { Block } from "./Block";
 import { GameState } from "./GameState";
+import { Util } from './Util'
 
 export class Ray {
     uVecDir?: UnitVector;
@@ -17,6 +18,12 @@ export class Ray {
 
     walkingFrameCount: number = 0;
     walkingFrameIncr: number = 4; //formula for num of up and downs is 1/(2/walingFrameIncr)
+
+    util: Util = new Util();
+
+    //if these aren not null/undefined, it means a bullet was hit along the way
+    bulletHitEndX?: number;
+    bulletHitEndY?: number;
 
     constructor(gState: GameState, canvas2D: HTMLCanvasElement, canvas3D: HTMLCanvasElement, uVecDir: UnitVector) {
         this.gState = gState;
@@ -36,22 +43,6 @@ export class Ray {
             this.grd.addColorStop(i*stopColorStep, `rgb(${color.r}, ${color.g}, ${color.b})`)
             this.adjustColor(color, {r: 0, g: -colorChangePerStopColor, b: -colorChangePerStopColor*1.4}); //that *1.4 is just there because to acc darken from light to dark blue to black the b part changes at a rate of 1.4
         }
-    }
-
-    getBlock(x: number, y: number):{x: number, y: number} {
-        let cellWidth: number = this.gState.getMapSizeInfo().cellWidth;
-        let cellHeight: number = this.gState.getMapSizeInfo().cellHeight;
-
-        let curXBlockIndex: number = Math.ceil(x/cellWidth)-1;
-        let curYBlockIndex: number = Math.ceil(y/cellHeight)-1;
-
-        return {x: curXBlockIndex, y: curYBlockIndex}
-    }
-
-    inBlock(curX: number, curY: number): boolean {
-        let curBlock = this.getBlock(curX, curY);
-        
-        return this.gState.getMapBlocks()[curBlock.y][curBlock.x].getBlockType() === BlockType.Wall;
     }
 
     getEdgeCords(block: Block): {bottomLeft: {x: number, y: number}, bottomRight: {x: number, y: number}, topRight: {x: number, y: number}, topLeft: {x: number, y: number}} {
@@ -99,7 +90,7 @@ export class Ray {
         let curX: number = this.gState.getCenterX();
         let curY: number = this.gState.getCenterY();
 
-        while (!this.inBlock(curX, curY)) {
+        while (!this.util.inMapBlock(curX, curY, this.gState.getMapSizeInfo(), this.gState.getMap())) {
             curX += this.uVecDir.getX()/8;
             curY += this.uVecDir.getY()/8;
         }
@@ -107,8 +98,8 @@ export class Ray {
         this.endX = curX;
         this.endY = curY;
 
-        let curBlock = this.getBlock(curX, curY);
-        let blockHit: Block = this.gState.getMapBlocks()[curBlock.y][curBlock.x];
+        let curBlock = this.util.getMapBlockFromCoord(curX, curY, this.gState.getMapSizeInfo());
+        let blockHit: Block = this.gState.getMap().getBlocks()[curBlock.y][curBlock.x];
         this.checkEdgeRay(blockHit);
     }
 
