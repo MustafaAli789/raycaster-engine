@@ -16,7 +16,7 @@ export class Bullet {
     xPos?: number;
     yPos?: number;
     uVecDir?: UnitVector;
-    velocity: number = 0;
+    velocity: number = 5;
     canvas2D?: HTMLCanvasElement;
     dim: number = 10; //i.e square side length
     mapSizeInfo?: MapSizeInfo;
@@ -131,6 +131,7 @@ export class Bullet {
     }
 
     //accounts for rotation
+    //A --> B --> C --> D is clockwise around rectangle from top left
     getBoundingBox(mapSizeInfo: MapSizeInfo): Rectangle {
 
         let mapHeight: number = mapSizeInfo.cellHeight*mapSizeInfo.rows;

@@ -253,7 +253,7 @@ export class Ray {
 
             //wall shading based on ray lengthdddddddd
             let color = {r: 0, g:183, b:255};
-            this.adjustColor(color, {r: 0, g: -this.lengthToBullet/0.5, b: -((this.lengthToBullet/0.5)*1.4)})
+            this.adjustColor(color, {r: 0, g: -this.lengthToBullet, b: -((this.lengthToBullet)*1.4)})
 
             ctx.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`
             ctx.fillRect(((sliceCol)*sliceWidth), bulletCeil, sliceWidth, bulletFloor-bulletCeil);
