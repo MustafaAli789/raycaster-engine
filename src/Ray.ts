@@ -4,6 +4,8 @@ import { BlockType } from "./BlockType";
 import { Block } from "./Block";
 import { GameState } from "./GameState";
 import { Util } from './Util'
+import { Bullet } from "./Bullet";
+import { Rectangle } from './Rectangle.interface'
 
 export class Ray {
     uVecDir?: UnitVector;
@@ -45,17 +47,17 @@ export class Ray {
         }
     }
 
-    getEdgeCords(block: Block): {bottomLeft: {x: number, y: number}, bottomRight: {x: number, y: number}, topRight: {x: number, y: number}, topLeft: {x: number, y: number}} {
+    getEdgeCords(block: Block): Rectangle {
         let cellWidth: number = this.gState.getMapSizeInfo().cellWidth;
         let cellHeight: number = this.gState.getMapSizeInfo().cellHeight;
 
         let blockX = cellWidth*block.getCol();
         let blockY = cellHeight*block.getRow();
 
-        return {bottomLeft: {x: blockX, y: blockY+cellHeight}, 
-            bottomRight: {x: blockX+cellWidth, y: blockY+cellHeight}, 
-            topRight: {x: blockX+cellWidth, y:blockY}, 
-            topLeft: {x: blockX, y: blockY}};
+        return {C: {x: blockX, y: blockY+cellHeight}, 
+            D: {x: blockX+cellWidth, y: blockY+cellHeight}, 
+            B: {x: blockX+cellWidth, y:blockY}, 
+            A: {x: blockX, y: blockY}};
     }
 
     checkEdgeRay(blockHit: Block): void {
@@ -86,11 +88,18 @@ export class Ray {
         })
     }
 
-    calculateEndAndIfEdge(): void {
+    calculateCollisionsAndIfEdge(): void {
         let curX: number = this.gState.getCenterX();
         let curY: number = this.gState.getCenterY();
 
+        let bullets: Bullet[] = this.gState.getAllBullets();
+
         while (!this.util.inMapBlock(curX, curY, this.gState.getMapSizeInfo(), this.gState.getMap())) {
+
+            // bullets.forEach(bullet => {
+                
+            // })
+
             curX += this.uVecDir.getX()/8;
             curY += this.uVecDir.getY()/8;
         }
@@ -116,7 +125,7 @@ export class Ray {
 
         this.uVecDir = newUVecDir;
 
-        this.calculateEndAndIfEdge();
+        this.calculateCollisionsAndIfEdge();
         this.length = this.getAdjustedLength();
 
         //walking frame incr controls how many pix the screen moves up and down per frame (so walking count is b/w osscilates b/w 0 and 60) while player moves

@@ -3,6 +3,7 @@ import { Map } from "./Map";
 import { MapSizeInfo } from "./MapSizeInfo.interface";
 import { UnitVector } from "./UnitVector";
 import { Util } from './Util'
+import { Rectangle } from './Rectangle.interface'
 
 enum ObjectHit {
     Player,
@@ -172,6 +173,38 @@ export class Bullet {
 
         ctx.fillRect(this.xPos, this.yPos, this.dim, this.dim);
         ctx.resetTransform()
+    }
+
+    //includes rotation
+    getBoundingBox(mapSizeInfo: MapSizeInfo): Rectangle {
+
+        let mapHeight: number = mapSizeInfo.cellHeight*mapSizeInfo.rows;
+
+        //the roation algo uses normal cartesian convention of bottom left as (0, 0) so need to inv y
+        let inverseY: number = mapHeight-this.yPos;
+
+        let midX: number = this.xPos + this.dim/2;
+        let midY: number = inverseY - this.dim/2;
+
+        let A: {x: number, y: number} = this.pointAfterRotation(this.xPos, inverseY, this.uVecDir.getDirRad(), midX, midY)
+        A.y = (inverseY - A.y);
+
+        let B: {x: number, y: number} = this.pointAfterRotation(this.xPos+this.dim, inverseY, this.uVecDir.getDirRad(), midX, midY)
+        A.y = (inverseY - A.y);
+
+        let C: {x: number, y: number} = this.pointAfterRotation(this.xPos, inverseY-this.dim, this.uVecDir.getDirRad(), midX, midY)
+        A.y = (inverseY - A.y);
+
+        let D: {x: number, y: number} = this.pointAfterRotation(this.xPos+this.dim, inverseY-this.dim, this.uVecDir.getDirRad(), midX, midY)
+        A.y = (inverseY - A.y);
+
+
+        return {
+            A: A,
+            B: B,
+            C: C,
+            D: D
+        }
     }
 
 

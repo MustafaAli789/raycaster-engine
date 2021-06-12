@@ -83,6 +83,11 @@ export class GameState {
         bullets.forEach(bullet => bullet.draw2D())
     }
 
+    getAllBullets(): Bullet[] {
+        let bullets: Bullet[] = this.player.getBullets().slice(0);
+        return bullets;
+    }
+
     // drawBullets(): void {
     //     this.player.getBullets().forEach(bullet => bullet.draw2D())
     // }

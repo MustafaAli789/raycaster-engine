@@ -1,17 +1,12 @@
 import { BlockType } from "./BlockType";
 import { Map } from "./Map";
 import { MapSizeInfo } from "./MapSizeInfo.interface";
+import { Rectangle } from './Rectangle.interface'
 
 interface Point {
     x: number, y: number
 }
 
-interface Rectangle {
-    A: {x: number, y: number},
-    B: {x: number, y: number},
-    C: {x: number, y: number},
-    D: {x: number, y: number},
-}
 
 interface Vector {
     x: number, y: number
