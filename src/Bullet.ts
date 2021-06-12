@@ -39,9 +39,9 @@ export class Bullet {
         return {x: curXBlockIndex, y: curYBlockIndex};
     }
 
-    pointAfterRotation(unRotatedX: number, unRotatedY: number, clockWiseRotation: number): {x: number, y: number} {
-        let newX: number = unRotatedX*Math.cos(-clockWiseRotation)-unRotatedY*Math.sin(-clockWiseRotation);
-        let newY: number = unRotatedX*Math.sin(-clockWiseRotation)+unRotatedY*Math.cos(-clockWiseRotation);
+    pointAfterRotation(unRotatedX: number, unRotatedY: number, clockWiseRotation: number, centerOfRotX: number, centerOfRotY: number): {x: number, y: number} {
+        let newX: number = (unRotatedX-centerOfRotX)*Math.cos(-clockWiseRotation)-(unRotatedY-centerOfRotY)*Math.sin(-clockWiseRotation)+centerOfRotX;
+        let newY: number = (unRotatedX-centerOfRotX)*Math.sin(-clockWiseRotation)+(unRotatedY-centerOfRotY)*Math.cos(-clockWiseRotation)+centerOfRotY;
         return {x: newX, y: newY};
     }
 
@@ -51,27 +51,26 @@ export class Bullet {
         //this vec is in the dir of the side of the bullet we care about
         let uVec: UnitVector = new UnitVector(this.uVecDir.getDirDeg());
 
-        //this vec is perpendicular to above one and will be used to move up the side of the bullet as we project out
-        let pUVec: UnitVector = new UnitVector(uVec.getDirDeg()+90);;
+        let mapHeight: number = map.mapSizeInfo.cellHeight*map.mapSizeInfo.rows;
 
-        //corner of bullet (forward is top left, left is bottom left, right is top right, bottom is bottom right) --> initial case is top left
-        //MUST TAKE INTO ACCOUNT ROTATION OF BULLET
-        //***using special formula for point after rotation: https://math.stackexchange.com/questions/270194/how-to-find-the-vertices-angle-after-rotation --> jus first formula
-        let startPoint: {x: number, y: number} = this.pointAfterRotation(this.xPos, this.yPos, uVec.getDirRad());
+        //the roation algo uses normal cartesian convention of bottom left as (0, 0) so need to inv y
+        let inverseY: number = mapHeight-this.yPos;
+
+        let midX: number = this.xPos + this.dim/2;
+        let midY: number = inverseY - this.dim/2;
+
+        //assume no rotation and move across top face of bullet from left to right
+        //then rotate points with rotation of bullet + additional rotatation dep on side
+        //***using special formula for point after rotation: https://math.stackexchange.com/questions/270194/how-to-find-the-vertices-angle-after-rotation --> the second expanded formula
+        let curPoint: {x: number, y: number};
 
         //FORWARD dir is same dir as unit vec for dir bullet is pointing
         if (side === 'LEFT') {
             uVec.updateDir(-90);
-            startPoint = this.pointAfterRotation(this.xPos, this.yPos+this.dim, uVec.getDirRad());
-            pUVec = new UnitVector(uVec.getDirDeg()+90);
         } else if (side === 'RIGHT') {
             uVec.updateDir(90);
-            startPoint = this.pointAfterRotation(this.xPos+this.dim, this.yPos, uVec.getDirRad());
-            pUVec = new UnitVector(uVec.getDirDeg()+90);
         } else if (side === 'BOTTOM') {
             uVec.updateDir(180);
-            startPoint = this.pointAfterRotation(this.xPos+this.dim, this.yPos+this.dim, uVec.getDirRad());
-            pUVec = new UnitVector(uVec.getDirDeg()+90);
         }
 
         let numProjections: number = 50;
@@ -80,15 +79,17 @@ export class Bullet {
         //really how far out from sied of sqaure we want to go
         let projMag: number = 0.01;
 
-        let projX: number = startPoint.x + uVec.getX()*projMag;
-        let projY: number = startPoint.y + uVec.getY()*projMag;
+        let projX: number;
+        let projY: number;
 
         for(let i =0; i<numProjections; i++) {
+
+            curPoint = this.pointAfterRotation(this.xPos+i*space, inverseY, uVec.getDirRad(), midX, midY);
+            projX = curPoint.x + uVec.getX()*projMag;
+            projY = (mapHeight-curPoint.y) + uVec.getY()*projMag;
+
             if (map.getBlocks()[this.getCurBlock(projX, projY).y][this.getCurBlock(projX, projY).x].getBlockType() === BlockType.Wall) {
                 return ObjectHit.Wall;
-            } else {
-                projX += pUVec.getX()*space;
-                projY += pUVec.getY()*space;
             }
         }
 
