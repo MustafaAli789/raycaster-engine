@@ -100,8 +100,8 @@ export class Ray {
         let curY: number = this.gState.getCenterY();
 
         while (!this.inBlock(curX, curY)) {
-            curX += this.uVecDir.getX()/4;
-            curY += this.uVecDir.getY()/4;
+            curX += this.uVecDir.getX()/8;
+            curY += this.uVecDir.getY()/8;
         }
 
         this.endX = curX;

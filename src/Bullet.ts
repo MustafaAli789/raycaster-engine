@@ -46,12 +46,12 @@ export class Bullet {
     }
 
     //the pont of this method is to project x even spaced vecs out of a side of the bullet (which is a square) and determine if any of those are in a player, ray, or wall
-    checkIfBulletSideInObject(side: string, map: Map): ObjectHit {
+    checkIfBulletSideInObject(side: string, map: Map, mapSizeInfo: MapSizeInfo): ObjectHit {
 
         //this vec is in the dir of the side of the bullet we care about
         let uVec: UnitVector = new UnitVector(this.uVecDir.getDirDeg());
 
-        let mapHeight: number = map.mapSizeInfo.cellHeight*map.mapSizeInfo.rows;
+        let mapHeight: number = mapSizeInfo.cellHeight*mapSizeInfo.rows;
 
         //the roation algo uses normal cartesian convention of bottom left as (0, 0) so need to inv y
         let inverseY: number = mapHeight-this.yPos;
@@ -82,7 +82,7 @@ export class Bullet {
         let projX: number;
         let projY: number;
 
-        for(let i =0; i<numProjections; i++) {
+        for(let i =0; i<=numProjections; i++) {
 
             curPoint = this.pointAfterRotation(this.xPos+i*space, inverseY, uVec.getDirRad(), midX, midY);
             projX = curPoint.x + uVec.getX()*projMag;
@@ -100,18 +100,18 @@ export class Bullet {
     //can then rotate unit vec 90 deg to elft and right and 180 deg to opp side to check all 4 sides
     //this will take into account the actual rotation of the thing
     //better to do  hit points on each side instead of one at the middle
-    checkObjectHit(map: Map): ObjectHit {
+    checkObjectHit(map: Map, mapSizeInfo: MapSizeInfo): ObjectHit {
 
-        if(this.checkIfBulletSideInObject('FORWARD', map) === ObjectHit.Wall) {
+        if(this.checkIfBulletSideInObject('FORWARD', map, mapSizeInfo) === ObjectHit.Wall) {
             return ObjectHit.Wall;
         }
-        if(this.checkIfBulletSideInObject('LEFT', map) === ObjectHit.Wall) {
+        if(this.checkIfBulletSideInObject('LEFT', map, mapSizeInfo) === ObjectHit.Wall) {
             return ObjectHit.Wall;
         }
-        if(this.checkIfBulletSideInObject('RIGHT', map) === ObjectHit.Wall) {
+        if(this.checkIfBulletSideInObject('RIGHT', map, mapSizeInfo) === ObjectHit.Wall) {
             return ObjectHit.Wall;
         }
-        if(this.checkIfBulletSideInObject('BOTTOM', map) === ObjectHit.Wall) {
+        if(this.checkIfBulletSideInObject('BOTTOM', map, mapSizeInfo) === ObjectHit.Wall) {
             return ObjectHit.Wall;
         }
 

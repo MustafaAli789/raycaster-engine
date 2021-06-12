@@ -74,7 +74,7 @@ export class GameState {
 
         bullets.forEach((bullet, i) => {
             bullet.moveBullet();
-            if (bullet.checkObjectHit(this.map) === ObjectHit.Wall) {
+            if (bullet.checkObjectHit(this.map, this.mapSizeInfo) === ObjectHit.Wall) {
                 this.player.removeBullets(i);
             }
         });
