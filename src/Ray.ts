@@ -247,14 +247,19 @@ export class Ray {
 
         //calcualting bullet ceil and floor if bullet in ray viewa
         if (this.bulletHitEndX && this.bulletHitEndY) {
-            // let bulletCeil: number = floor/2 - floor/(this.lengthToBullet/10)
-            // let bulletFloor: number = floor - bulletCeil;
+            
+            //cant use the ceiling and floor from above since the crouching and walking shift mess stuff up
+            //all we really want is a floor and ceiling rel to center of screen but crouchign shift makes stuff off center
+            //closer stuff will go up more than farther stuff and be even more off center
+            let ceil: number = this.canvas3D.height/2 - this.canvas3D.height/(this.length/12);
+            let flr: number = this.canvas3D.height - ceil;
 
-            let mid:number = (floor-(ceiling-crouchingFactor))/2+ceiling;
+
+            let mid:number = (flr-ceil)/2+ceil;
             let bulletCeil = mid - this.canvas3D.height/(this.lengthToBullet/1.5)
             let bulletFloor = mid+(mid-bulletCeil)
 
-            //wall shading based on ray lengthdddddddd
+            //wall shading based on ray length
             let color = {r: 224, g:86, b:0};
             this.adjustColor(color, {r: -((this.lengthToBullet/3)*2.6), g: -this.lengthToBullet/3, b: 0})
 
