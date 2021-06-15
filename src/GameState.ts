@@ -18,17 +18,20 @@ export class GameState {
     
     player?: Player;
     canvas2D?: HTMLCanvasElement;
+    canvas3D?: HTMLCanvasElement;
     map?: Map;
 
     mapSizeInfo?: MapSizeInfo;
 
-    constructor(canvas2D: HTMLCanvasElement, mapTemplate: BlockType[][], audioControl: AudioControl) {
+    constructor(canvas2D: HTMLCanvasElement, canvas3D: HTMLCanvasElement, mapTemplate: BlockType[][], audioControl: AudioControl) {
+        this.canvas2D = canvas2D;
+        this.canvas3D = canvas3D;
         this.mapSizeInfo = {rows: mapTemplate.length, 
                             cols: mapTemplate[0].length, 
                             cellWidth: canvas2D.width/mapTemplate[0].length,
                             cellHeight: canvas2D.height/mapTemplate.length}
         this.map = new Map(this.mapSizeInfo, mapTemplate, canvas2D);
-        this.player =  new Player(300, 350, new UnitVector(270), this.map, canvas2D, audioControl, this.mapSizeInfo);
+        this.player =  new Player(300, 350, new UnitVector(270), this.map, canvas2D, canvas3D, audioControl, this.mapSizeInfo);
     }
 
     //Player info

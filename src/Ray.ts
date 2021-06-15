@@ -193,6 +193,7 @@ export class Ray {
             ctx.lineTo(this.endX, this.endY);
         }
 
+        ctx.lineTo(this.endX, this.endY);
         ctx.stroke();
         ctx.strokeStyle = "black";
     }
@@ -254,8 +255,8 @@ export class Ray {
             let bulletFloor = mid+(mid-bulletCeil)
 
             //wall shading based on ray lengthdddddddd
-            let color = {r: 0, g:183, b:255};
-            this.adjustColor(color, {r: 0, g: -this.lengthToBullet*2, b: -((this.lengthToBullet)*1.4)*2})
+            let color = {r: 224, g:86, b:0};
+            this.adjustColor(color, {r: -((this.lengthToBullet/3)*2.6), g: -this.lengthToBullet/3, b: 0})
 
             ctx.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`
             ctx.fillRect(((sliceCol)*sliceWidth), bulletCeil, sliceWidth, bulletFloor-bulletCeil);

@@ -27,25 +27,30 @@ export class Player {
     playerCircleRadius: number = 2;
     keysState: {} = {};
     canvas2D?: HTMLCanvasElement;
+    canvas3D?: HTMLCanvasElement;
     audioControl?: AudioControl;
     mapSizeInfo?: MapSizeInfo;
+
+    curMousePosX?: number;
 
     bullets: Bullet[] = [];
 
     util: Util = new Util();
 
     
-    constructor(xPos: number, yPos: number, startingDirUVec: UnitVector, map: Map, canvas2D: HTMLCanvasElement, audioControl: AudioControl, mapSizeInfo: MapSizeInfo) {
+    constructor(xPos: number, yPos: number, startingDirUVec: UnitVector, map: Map, canvas2D: HTMLCanvasElement, canvas3D: HTMLCanvasElement, audioControl: AudioControl, mapSizeInfo: MapSizeInfo) {
         this.xPos= xPos;
         this.yPos = yPos;
         this.dirUVec = startingDirUVec;
         this.map = map;
         this.canvas2D = canvas2D;
+        this.canvas3D=canvas3D;
         this.audioControl = audioControl;
         this.mapSizeInfo = mapSizeInfo;
 
         window.addEventListener('click', () => {
-            let uVec: UnitVector = new UnitVector(this.dirUVec.getDirDeg());
+            let ang: number = Math.atan((this.curMousePosX-700/2)/350) + this.dirUVec.getDirRad();
+            let uVec: UnitVector = new UnitVector(this.util.toDeg(ang));
             this.bullets.push(new Bullet(this.getXMid(), this.getYMid(), uVec, this.canvas2D, this.mapSizeInfo));
         });
 
@@ -93,9 +98,12 @@ export class Player {
             }
         });
         
-        // window.addEventListener('mousemove', (e) => {
-        //     this.curMousePosX = e.clientX;
-        // })
+        window.addEventListener('mousemove', (e) => {
+            let rect = this.canvas3D.getBoundingClientRect();
+            let xPos: number = e.clientX - rect.left;
+            this.curMousePosX = xPos;
+            console.log(e.clientX);
+        })
 
         window.addEventListener('keydown', (e) => {
             switch(e.key) {

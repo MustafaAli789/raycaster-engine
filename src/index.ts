@@ -30,7 +30,7 @@ let mapTemplate: BlockType[][] = [
     [BlockType.Wall, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Wall],
     [BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall],
 ]
-const GState: GameState = new GameState(canvas2D, mapTemplate, audioControl);
+const GState: GameState = new GameState(canvas2D, canvas3D, mapTemplate, audioControl);
 const rays: Rays = new Rays(GState, canvas2D, canvas3D);
 
 // window.addEventListener('mousemove', (e) => {
