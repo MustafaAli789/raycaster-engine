@@ -254,8 +254,8 @@ export class Ray {
             //cant use the ceiling and floor from above since the crouching and walking shift mess stuff up
             //all we really want is a floor and ceiling rel to center of screen but crouchign shift makes stuff off center
             //closer stuff will go up more than farther stuff and be even more off center
-            let ceil: number = this.canvas3D.height/2 - this.canvas3D.height/(this.length/12);
-            let flr: number = this.canvas3D.height - ceil;
+            let ceil: number = this.canvas3D.height/2 - this.canvas3D.height/(this.length/12) + walkingFactor;
+            let flr: number = this.canvas3D.height - ceil  +walkingFactor*2d;
 
             let crouchedBulletShift: number = crouchingPixhift*(1/(this.lengthToBullet/12));
 
@@ -270,7 +270,8 @@ export class Ray {
                     mid += crouchedBulletShift;
                 }
             }
-            let bulletCeil = mid - this.canvas3D.height/(this.lengthToBullet/1.5)
+            let shiftFromMid: number = this.canvas3D.height/(this.lengthToBullet/1.5)
+            let bulletCeil = mid - shiftFromMid
             let bulletFloor = mid+(mid-bulletCeil)
 
             //wall shading based on ray length
