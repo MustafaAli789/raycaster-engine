@@ -18,8 +18,8 @@ export class Player {
 
     standingVel: number = 1.5;
     crouchingVel: number = 0.75;
-    runningVel: number = 4;
-    standingAngularVel: number = 3;
+    runningVel: number = 3;
+    standingAngularVel: number = 9;
     crouchingAngularVel: number = 1.5;
 
     dirUVec?: UnitVector; //uses degree angle

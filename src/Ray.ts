@@ -103,17 +103,19 @@ export class Ray {
             if (!this.bulletHitEndX && !this.bulletHitEndY) {
                 for (let i =0; i<bullets.length; i++) {
                     let bullet: Bullet = bullets[i];
-                    let boundingBox: Rectangle = bullet.getBoundingBox(this.gState.getMapSizeInfo());
-                    if (this.util.pointInRectangle({x: curX, y: curY}, boundingBox)) {
-                        this.bulletHitEndX = curX;
-                        this.bulletHitEndY = curY;
-                        break;
+                    if (Math.sqrt((curX-bullet.getX())**2+(curY-bullet.getY())**2)< 7) { //choosing 14 cause thats the diagonal of a square with side len 10
+                        let boundingBox: Rectangle = bullet.getBoundingBox(this.gState.getMapSizeInfo());
+                        if (this.util.pointInRectangle({x: curX, y: curY}, boundingBox)) {
+                            this.bulletHitEndX = curX;
+                            this.bulletHitEndY = curY;
+                            break;
+                        }
                     }
                 }
             }
 
-            curX += this.uVecDir.getX()/8;
-            curY += this.uVecDir.getY()/8;
+            curX += this.uVecDir.getX()/4;
+            curY += this.uVecDir.getY()/4;
         }
 
         this.endX = curX;
@@ -141,7 +143,7 @@ export class Ray {
         this.length = this.getAdjustedLength(this.endX, this.endY);
         
         if (this.bulletHitEndX && this.bulletHitEndY){
-            this.lengthToBullet = Math.sqrt((this.gState.getCenterX()-this.bulletHitEndX)**2 + (this.gState.getCenterY()-this.bulletHitEndY)**2);
+            this.lengthToBullet = this.getAdjustedLength(this.bulletHitEndX, this.bulletHitEndY);
         }
 
         //walking frame incr controls how many pix the screen moves up and down per frame (so walking count is b/w osscilates b/w 0 and 60) while player moves
@@ -223,7 +225,7 @@ export class Ray {
 
         //coloring center col and edge cols differently
         if (Math.abs(this.gState.getCenterDir().getDirRad()-this.uVecDir.getDirRad()) <= 0.0075) {
-            //dctx.fillStyle = "#FF0000";
+            ctx.fillStyle = "#FF0000";
         } else if (this.edgeRay){
             let color = {r:125, g:125, b:125};
             this.adjustColor(color, {r: -this.length/3.5, g: -this.length/3.5, b: -this.length/3.5})
@@ -247,13 +249,13 @@ export class Ray {
             // let bulletCeil: number = floor/2 - floor/(this.lengthToBullet/10)
             // let bulletFloor: number = floor - bulletCeil;
 
-            let mid:number = (floor-ceiling)/2+ceiling;
-            let bulletCeil = mid - this.canvas3D.height/(this.lengthToBullet/2)
+            let mid:number = (floor-(ceiling-crouchingFactor))/2+ceiling;
+            let bulletCeil = mid - this.canvas3D.height/(this.lengthToBullet/1.5)
             let bulletFloor = mid+(mid-bulletCeil)
 
             //wall shading based on ray lengthdddddddd
             let color = {r: 0, g:183, b:255};
-            this.adjustColor(color, {r: 0, g: -this.lengthToBullet, b: -((this.lengthToBullet)*1.4)})
+            this.adjustColor(color, {r: 0, g: -this.lengthToBullet*2, b: -((this.lengthToBullet)*1.4)*2})
 
             ctx.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`
             ctx.fillRect(((sliceCol)*sliceWidth), bulletCeil, sliceWidth, bulletFloor-bulletCeil);

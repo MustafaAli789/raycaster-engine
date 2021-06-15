@@ -16,9 +16,9 @@ export class Bullet {
     xPos?: number;
     yPos?: number;
     uVecDir?: UnitVector;
-    velocity: number = 5;
+    velocity: number = 1;
     canvas2D?: HTMLCanvasElement;
-    dim: number = 10; //i.e square side length
+    dim: number = 5; //i.e square side length
     mapSizeInfo?: MapSizeInfo;
 
     util: Util = new Util();
@@ -128,6 +128,14 @@ export class Bullet {
 
         ctx.fillRect(this.xPos, this.yPos, this.dim, this.dim);
         ctx.resetTransform()
+    }
+
+    getX(): number{
+        return this.xPos;
+    }
+
+    getY(): number {
+        return this.yPos;
     }
 
     //accounts for rotation
