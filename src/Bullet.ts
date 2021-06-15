@@ -16,7 +16,7 @@ export class Bullet {
     xPos?: number;
     yPos?: number;
     uVecDir?: UnitVector;
-    velocity: number = 0;
+    velocity: number = 2;
     canvas2D?: HTMLCanvasElement;
     dim: number = 5; //i.e square side length
     mapSizeInfo?: MapSizeInfo;

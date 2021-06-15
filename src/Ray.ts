@@ -257,15 +257,17 @@ export class Ray {
             let ceil: number = this.canvas3D.height/2 - this.canvas3D.height/(this.length/12);
             let flr: number = this.canvas3D.height - ceil;
 
+            let crouchedBulletShift: number = crouchingPixhift*(1/(this.lengthToBullet/12));
+
 
             let mid:number = (flr-ceil)/2+ceil;
             if (!this.gState.isPlayerCrouching()) {
                 if (this.crouchedBullet) {
-                    mid += crouchingFactor*-1;
+                    mid += crouchedBulletShift*-1;
                 }
             } else {
                 if (!this.crouchedBullet) {
-                    mid += crouchingFactor;
+                    mid += crouchedBulletShift;
                 }
             }
             let bulletCeil = mid - this.canvas3D.height/(this.lengthToBullet/1.5)
@@ -274,6 +276,9 @@ export class Ray {
             //wall shading based on ray length
             let color = {r: 224, g:86, b:0};
             this.adjustColor(color, {r: -((this.lengthToBullet/3)*2.6), g: -this.lengthToBullet/3, b: 0})
+
+            ctx.fillStyle = 'white';
+            ctx.fillRect(((sliceCol)*sliceWidth), bulletCeil-0.5, sliceWidth, (bulletFloor-bulletCeil)+1);
 
             ctx.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`
             ctx.fillRect(((sliceCol)*sliceWidth), bulletCeil, sliceWidth, bulletFloor-bulletCeil);
