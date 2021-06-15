@@ -16,20 +16,22 @@ export class Bullet {
     xPos?: number;
     yPos?: number;
     uVecDir?: UnitVector;
-    velocity: number = 5;
+    velocity: number = 0;
     canvas2D?: HTMLCanvasElement;
     dim: number = 5; //i.e square side length
     mapSizeInfo?: MapSizeInfo;
+    crouchedBullet: boolean = false; //if bullet was created while player crouched (needed for rendering height of bullet in 3d)
 
     util: Util = new Util();
     
 
-    constructor(startX: number, startY: number, uVecDir: UnitVector, canvas2D: HTMLCanvasElement, mapSizeInfo: MapSizeInfo){
+    constructor(startX: number, startY: number, uVecDir: UnitVector, canvas2D: HTMLCanvasElement, mapSizeInfo: MapSizeInfo, crouchedBullet: boolean){
         this.xPos = startX-this.dim/2; //center bullet around player
         this.yPos = startY-this.dim/2; //center bullet around player
         this.uVecDir = uVecDir;
         this.canvas2D = canvas2D;
         this.mapSizeInfo = mapSizeInfo;
+        this.crouchedBullet = crouchedBullet;
     }
 
     moveBullet(): void {
@@ -169,6 +171,10 @@ export class Bullet {
             C: C,
             D: D
         }
+    }
+
+    getCrouchedBullet(): boolean {
+        return this.crouchedBullet;
     }
 
 

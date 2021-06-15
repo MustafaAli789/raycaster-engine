@@ -24,9 +24,11 @@ export class Ray {
     util: Util = new Util();
 
     //if these aren not null/undefined, it means a bullet was hit along the way
+    //it doesnt matter if theres like 20 bullets that a ray goes through, only the closest one will be seen anyway
     bulletHitEndX?: number;
     bulletHitEndY?: number;
     lengthToBullet?: number;
+    crouchedBullet?: boolean;
 
     constructor(gState: GameState, canvas2D: HTMLCanvasElement, canvas3D: HTMLCanvasElement, uVecDir: UnitVector) {
         this.gState = gState;
@@ -108,6 +110,7 @@ export class Ray {
                         if (this.util.pointInRectangle({x: curX, y: curY}, boundingBox)) {
                             this.bulletHitEndX = curX;
                             this.bulletHitEndY = curY;
+                            this.crouchedBullet = bullet.getCrouchedBullet();
                             break;
                         }
                     }
@@ -208,13 +211,13 @@ export class Ray {
         let ctx = this.canvas3D.getContext('2d');
 
         //crouching and running animation
-        let crouchingPixhift: number = this.gState.isPlayerCrouching() ? -250 : 0;
+        let crouchingPixhift: number = -250;
         let crouchingFactor: number = crouchingPixhift*(1/(this.length/12)); //need to factor in length of ray because clsoer stuff gets more tall than stuff thats further away
         let walkingFactor: number = this.walkingFrameCount/10;
 
         //calculating ceiling and floor given length of ray + walking and crouching animation
-        let ceiling: number = this.canvas3D.height/2 - this.canvas3D.height/(this.length/12) + walkingFactor + crouchingFactor;
-        let floor: number = this.canvas3D.height - ceiling + walkingFactor*2 + crouchingFactor*2;
+        let ceiling: number = this.canvas3D.height/2 - this.canvas3D.height/(this.length/12) + (this.gState.isPlayerCrouching() ? crouchingFactor : 0) + walkingFactor;
+        let floor: number = this.canvas3D.height - ceiling + walkingFactor*2 + (this.gState.isPlayerCrouching() ? crouchingFactor*2 : 0);
 
         let distFromCeilToFloor: number = floor-ceiling;
 
@@ -256,6 +259,15 @@ export class Ray {
 
 
             let mid:number = (flr-ceil)/2+ceil;
+            if (!this.gState.isPlayerCrouching()) {
+                if (this.crouchedBullet) {
+                    mid += crouchingFactor*-1;
+                }
+            } else {
+                if (!this.crouchedBullet) {
+                    mid += crouchingFactor;
+                }
+            }
             let bulletCeil = mid - this.canvas3D.height/(this.lengthToBullet/1.5)
             let bulletFloor = mid+(mid-bulletCeil)
 

@@ -51,7 +51,7 @@ export class Player {
         window.addEventListener('click', () => {
             let ang: number = Math.atan((this.curMousePosX-700/2)/350) + this.dirUVec.getDirRad();
             let uVec: UnitVector = new UnitVector(this.util.toDeg(ang));
-            this.bullets.push(new Bullet(this.getXMid(), this.getYMid(), uVec, this.canvas2D, this.mapSizeInfo));
+            this.bullets.push(new Bullet(this.getXMid(), this.getYMid(), uVec, this.canvas2D, this.mapSizeInfo, this.isPlayerCrouching()));
         });
 
         window.addEventListener('keyup', (e) => {
