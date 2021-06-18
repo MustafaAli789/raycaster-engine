@@ -1,4 +1,4 @@
-import { BlockType } from "./BlockType";
+import { BlockType } from "./Model/EBlockType";
 import { Map } from "./Map";
 
 export class AreaState {

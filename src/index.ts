@@ -1,6 +1,6 @@
 import { AreaState } from "./AreaState";
 import { AudioControl } from "./AudioContro";
-import { BlockType } from "./BlockType";
+import { BlockType } from "./Model/EBlockType";
 import { GameState } from "./GameState";
 import { Map } from "./Map";
 import { Player } from "./Player";

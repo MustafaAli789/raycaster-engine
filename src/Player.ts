@@ -1,8 +1,5 @@
-import { Map } from './Map';
-import { BlockType } from './BlockType';
 import { UnitVector } from './UnitVector'
 import { AudioControl } from './AudioContro';
-import {MapSizeInfo} from './MapSizeInfo.interface'
 import { Bullet } from './Bullet';
 import { Util } from './Util'
 import { AreaState } from './AreaState';

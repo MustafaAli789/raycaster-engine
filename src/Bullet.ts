@@ -1,9 +1,6 @@
-import { BlockType } from "./BlockType";
-import { Map } from "./Map";
-import { MapSizeInfo } from "./MapSizeInfo.interface";
 import { UnitVector } from "./UnitVector";
 import { Util } from './Util'
-import { Rectangle } from './Rectangle.interface'
+import { Rectangle } from './Model/IRectangle'
 import { AreaState } from "./AreaState";
 
 enum ObjectHit {

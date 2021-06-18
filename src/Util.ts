@@ -1,7 +1,6 @@
-import { BlockType } from "./BlockType";
+import { BlockType } from "./Model/EBlockType";
 import { Map } from "./Map";
-import { MapSizeInfo } from "./MapSizeInfo.interface";
-import { Rectangle } from './Rectangle.interface'
+import { Rectangle } from './Model/IRectangle'
 
 interface Point {
     x: number, y: number

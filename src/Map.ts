@@ -1,5 +1,5 @@
 import { Block } from './Block'
-import { BlockType } from './BlockType';
+import { BlockType } from './Model/EBlockType';
 
 export class Map {
     cellWidth?: number;

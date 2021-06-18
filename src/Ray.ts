@@ -1,11 +1,11 @@
 import { UnitVector } from "./UnitVector";
 import { Map } from "./Map";
-import { BlockType } from "./BlockType";
+import { BlockType } from "./Model/EBlockType";
 import { Block } from "./Block";
 import { GameState } from "./GameState";
 import { Util } from './Util'
 import { Bullet } from "./Bullet";
-import { Rectangle } from './Rectangle.interface'
+import { Rectangle } from './Model/IRectangle'
 import { AreaState } from "./AreaState";
 
 export class Ray {
@@ -257,7 +257,7 @@ export class Ray {
             //all we really want is a floor and ceiling rel to center of screen but crouchign shift makes stuff off center
             //closer stuff will go up more than farther stuff and be even more off center
             let ceil: number = canvas3DHeight/2 - canvas3DHeight/(this.length/12) + walkingFactor;
-            let flr: number = canvas3DHeight - ceil  +walkingFactor*2;
+            let flr: number = canvas3DHeight - ceil  + walkingFactor*2;
 
             let crouchedBulletShift: number = crouchingPixhift*(1/(this.lengthToBullet/12));
 
