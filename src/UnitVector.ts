@@ -9,6 +9,7 @@ export class UnitVector {
         this.y = Math.sin(this.toRad(dir));
     }
 
+    //change is in deg
     updateDir(change: number): void {
         this.dir += change;
         this.x = Math.cos(this.toRad(this.dir));
