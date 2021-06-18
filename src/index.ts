@@ -1,3 +1,4 @@
+import { AreaState } from "./AreaState";
 import { AudioControl } from "./AudioContro";
 import { BlockType } from "./BlockType";
 import { GameState } from "./GameState";
@@ -30,8 +31,9 @@ let mapTemplate: BlockType[][] = [
     [BlockType.Wall, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Wall],
     [BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall],
 ]
-const GState: GameState = new GameState(canvas2D, canvas3D, mapTemplate, audioControl);
-const rays: Rays = new Rays(GState, canvas2D, canvas3D);
+const AState: AreaState = new AreaState(canvas2D, canvas3D, mapTemplate);
+const GState: GameState = new GameState(AState, audioControl);
+const rays: Rays = new Rays(GState, AState);
 
 // window.addEventListener('mousemove', (e) => {
 //     var rect = canvas.getBoundingClientRect();
@@ -46,7 +48,7 @@ function clearCanvas(canvas: HTMLCanvasElement): void {
 function main(): void {
     clearCanvas(canvas2D);
     clearCanvas(canvas3D);
-    GState.drawMap();
+    AState.drawMap();
     GState.drawPlayer();
     rays.setupRays();
     rays.draw2D();

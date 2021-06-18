@@ -6,14 +6,16 @@ import { GameState } from "./GameState";
 import { Util } from './Util'
 import { Bullet } from "./Bullet";
 import { Rectangle } from './Rectangle.interface'
+import { AreaState } from "./AreaState";
 
 export class Ray {
     uVecDir?: UnitVector;
     endX?: number;
     endY?: number;
-    gState?: GameState;
-    canvas2D?: HTMLCanvasElement;
-    canvas3D?: HTMLCanvasElement;
+
+    gameState?: GameState;
+    areaState?: AreaState;
+    
     edgeRay?: boolean;
     grd?: CanvasGradient;
     length?: number;
@@ -30,18 +32,17 @@ export class Ray {
     lengthToBullet?: number;
     crouchedBullet?: boolean;
 
-    constructor(gState: GameState, canvas2D: HTMLCanvasElement, canvas3D: HTMLCanvasElement, uVecDir: UnitVector) {
-        this.gState = gState;
-        this.canvas2D = canvas2D;
-        this.canvas3D = canvas3D;
+    constructor(gameState: GameState, areaState: AreaState, uVecDir: UnitVector) {
+        this.gameState = gameState;
+        this.areaState = areaState;
         this.uVecDir = uVecDir;
 
         //floor will be at max half way up the screen i.e canvas3d height / 2
         let color = {r: 0, g:183, b:255};
-        this.grd = canvas3D.getContext('2d').createLinearGradient(0, canvas3D.height, 0, canvas3D.height/2);
+        this.grd = this.areaState.getCanvas3D().getContext('2d').createLinearGradient(0, this.areaState.geCanvast3DHeight(), 0, this.areaState.geCanvast3DHeight()/2);
         let numPixToAddNewStopColor: number = 2.5;
         let colorChangePerStopColor: number = 1;
-        let numIncrs: number = Math.ceil((canvas3D.height/2)/numPixToAddNewStopColor);
+        let numIncrs: number = Math.ceil((this.areaState.geCanvast3DHeight()/2)/numPixToAddNewStopColor);
         let stopColorStep: number = 1/numIncrs;
 
         for(let i =0; i<numIncrs;i++) {
@@ -51,8 +52,8 @@ export class Ray {
     }
 
     getEdgeCords(block: Block): Rectangle {
-        let cellWidth: number = this.gState.getMapSizeInfo().cellWidth;
-        let cellHeight: number = this.gState.getMapSizeInfo().cellHeight;
+        let cellWidth: number = this.areaState.getCellWidth();
+        let cellHeight: number = this.areaState.getCellHeight();
 
         let blockX = cellWidth*block.getCol();
         let blockY = cellHeight*block.getRow();
@@ -73,7 +74,7 @@ export class Ray {
         let distBetweenRayEndAndStartToEdgeVecEnd: number = null;
 
         Object.keys(edgeCoords).forEach(key => {
-            startToEdgeVec = {x: edgeCoords[key].x-this.gState.getCenterX(), y: edgeCoords[key].y-this.gState.getCenterY()}
+            startToEdgeVec = {x: edgeCoords[key].x-this.gameState.getCenterX(), y: edgeCoords[key].y-this.gameState.getCenterY()}
             startToEdgeVecMag = Math.sqrt(startToEdgeVec.x**2 + startToEdgeVec.y**2);
 
             //doing dot prod to get angle between ray vec nad start to edge vec
@@ -92,21 +93,21 @@ export class Ray {
     }
 
     calculateCollisionsAndIfEdge(): void {
-        let curX: number = this.gState.getCenterX();
-        let curY: number = this.gState.getCenterY();
+        let curX: number = this.gameState.getCenterX();
+        let curY: number = this.gameState.getCenterY();
 
         this.bulletHitEndX = null;
         this.bulletHitEndY = null;
 
-        let bullets: Bullet[] = this.gState.getAllBullets();
+        let bullets: Bullet[] = this.gameState.getAllBullets();
 
-        while (!this.util.inMapBlock(curX, curY, this.gState.getMapSizeInfo(), this.gState.getMap())) {
+        while (!this.util.inMapBlock(curX, curY, this.areaState.getMap(), this.areaState.getCellWidth(), this.areaState.getCellHeight())) {
 
             if (!this.bulletHitEndX && !this.bulletHitEndY) {
                 for (let i =0; i<bullets.length; i++) {
                     let bullet: Bullet = bullets[i];
                     if (Math.sqrt((curX-bullet.getX())**2+(curY-bullet.getY())**2)< 7) { //choosing 14 cause thats the diagonal of a square with side len 10
-                        let boundingBox: Rectangle = bullet.getBoundingBox(this.gState.getMapSizeInfo());
+                        let boundingBox: Rectangle = bullet.getBoundingBox();
                         if (this.util.pointInRectangle({x: curX, y: curY}, boundingBox)) {
                             this.bulletHitEndX = curX;
                             this.bulletHitEndY = curY;
@@ -124,16 +125,16 @@ export class Ray {
         this.endX = curX;
         this.endY = curY;
 
-        let curBlock = this.util.getMapBlockFromCoord(curX, curY, this.gState.getMapSizeInfo());
-        let blockHit: Block = this.gState.getMap().getBlocks()[curBlock.y][curBlock.x];
+        let curBlock = this.util.getMapBlockFromCoord(curX, curY, this.areaState.getCellWidth(), this.areaState.getCellHeight());
+        let blockHit: Block = this.areaState.getMap().getBlocks()[curBlock.y][curBlock.x];
         this.checkEdgeRay(blockHit);
     }
 
     getAdjustedLength(endX: number, endY:number): number {
-        let rayLen: number = Math.sqrt((this.gState.getCenterX()-endX)**2 + (this.gState.getCenterY()-endY)**2);
+        let rayLen: number = Math.sqrt((this.gameState.getCenterX()-endX)**2 + (this.gameState.getCenterY()-endY)**2);
 
         //lin alg eqn i.e dot prod of two vecs / prod of their magniture = cos of angle between em (mag of both here is 1 tho)
-        let cosTheta: number = this.uVecDir.getX()*this.gState.getCenterDir().getX()+this.uVecDir.getY()*this.gState.getCenterDir().getY();
+        let cosTheta: number = this.uVecDir.getX()*this.gameState.getCenterDir().getX()+this.uVecDir.getY()*this.gameState.getCenterDir().getY();
         
         return rayLen*cosTheta;
     }
@@ -154,10 +155,10 @@ export class Ray {
 
         //first normalzie walkign frame incr to 1 and then multip by factor
         //cant just say = 3 or = 6 cause they mighta been a neg num before
-        if (this.gState.isPlayerCrouching()) {
+        if (this.gameState.isPlayerCrouching()) {
             this.walkingFrameIncr = this.walkingFrameIncr/Math.abs(this.walkingFrameIncr);
             this.walkingFrameIncr*=2;
-        } else if (this.gState.isPlayerRunning()) {
+        } else if (this.gameState.isPlayerRunning()) {
             this.walkingFrameIncr = this.walkingFrameIncr/Math.abs(this.walkingFrameIncr);
             this.walkingFrameIncr*=8;
         } else {
@@ -165,7 +166,7 @@ export class Ray {
             this.walkingFrameIncr*=4;
         }
 
-        if (!this.gState.isPlayerMoving()) {
+        if (!this.gameState.isPlayerMoving()) {
             this.walkingFrameCount = 0;
         } else if(this.walkingFrameCount <= 60 && this.walkingFrameCount >= 0) {
             this.walkingFrameCount += this.walkingFrameIncr;
@@ -176,15 +177,15 @@ export class Ray {
     }
 
     drawRay2D(): void {
-        let ctx = this.canvas2D.getContext('2d');
+        let ctx = this.areaState.getCanvas2D().getContext('2d');
 
-        if (this.gState.getCenterDir().getDirRad() == this.uVecDir.getDirRad()) { //this is the center col
+        if (this.gameState.getCenterDir().getDirRad() == this.uVecDir.getDirRad()) { //this is the center col
             ctx.strokeStyle = "#FF0000";
         } else {
             ctx.strokeStyle = "black";
         }
         ctx.beginPath();
-        ctx.moveTo(this.gState.getCenterX(), this.gState.getCenterY());
+        ctx.moveTo(this.gameState.getCenterX(), this.gameState.getCenterY());
 
         if(this.bulletHitEndX && this.bulletHitEndY) {
             ctx.strokeStyle = 'blue';
@@ -208,7 +209,8 @@ export class Ray {
     }
 
     drawRay3D(sliceWidth: number, sliceCol: number): void {
-        let ctx = this.canvas3D.getContext('2d');
+        let ctx = this.areaState.getCanvas3D().getContext('2d');
+        let canvas3DHeight = this.areaState.geCanvast3DHeight();
 
         //crouching and running animation
         let crouchingPixhift: number = -250;
@@ -216,8 +218,8 @@ export class Ray {
         let walkingFactor: number = this.walkingFrameCount/10;
 
         //calculating ceiling and floor given length of ray + walking and crouching animation
-        let ceiling: number = this.canvas3D.height/2 - this.canvas3D.height/(this.length/12) + (this.gState.isPlayerCrouching() ? crouchingFactor : 0) + walkingFactor;
-        let floor: number = this.canvas3D.height - ceiling + walkingFactor*2 + (this.gState.isPlayerCrouching() ? crouchingFactor*2 : 0);
+        let ceiling: number = canvas3DHeight/2 - canvas3DHeight/(this.length/12) + (this.gameState.isPlayerCrouching() ? crouchingFactor : 0) + walkingFactor;
+        let floor: number = canvas3DHeight - ceiling + walkingFactor*2 + (this.gameState.isPlayerCrouching() ? crouchingFactor*2 : 0);
 
         let distFromCeilToFloor: number = floor-ceiling;
 
@@ -228,7 +230,7 @@ export class Ray {
         ctx.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`
 
         //coloring center col and edge cols differently
-        if (Math.abs(this.gState.getCenterDir().getDirRad()-this.uVecDir.getDirRad()) <= 0.0075) {
+        if (Math.abs(this.gameState.getCenterDir().getDirRad()-this.uVecDir.getDirRad()) <= 0.0075) {
             ctx.fillStyle = "#FF0000";
         } else if (this.edgeRay){
             let color = {r:125, g:125, b:125};
@@ -242,7 +244,7 @@ export class Ray {
 
         //FLOOR COLUMN
         ctx.fillStyle = this.grd;
-        ctx.fillRect(((sliceCol)*sliceWidth), floor, sliceWidth, this.canvas3D.height-floor);
+        ctx.fillRect(((sliceCol)*sliceWidth), floor, sliceWidth, canvas3DHeight-floor);
 
         //SKY COLUMN
         ctx.fillStyle = 'black';
@@ -254,14 +256,14 @@ export class Ray {
             //cant use the ceiling and floor from above since the crouching and walking shift mess stuff up
             //all we really want is a floor and ceiling rel to center of screen but crouchign shift makes stuff off center
             //closer stuff will go up more than farther stuff and be even more off center
-            let ceil: number = this.canvas3D.height/2 - this.canvas3D.height/(this.length/12) + walkingFactor;
-            let flr: number = this.canvas3D.height - ceil  +walkingFactor*2d;
+            let ceil: number = canvas3DHeight/2 - canvas3DHeight/(this.length/12) + walkingFactor;
+            let flr: number = canvas3DHeight - ceil  +walkingFactor*2;
 
             let crouchedBulletShift: number = crouchingPixhift*(1/(this.lengthToBullet/12));
 
 
             let mid:number = (flr-ceil)/2+ceil;
-            if (!this.gState.isPlayerCrouching()) {
+            if (!this.gameState.isPlayerCrouching()) {
                 if (this.crouchedBullet) {
                     mid += crouchedBulletShift*-1;
                 }
@@ -270,7 +272,7 @@ export class Ray {
                     mid += crouchedBulletShift;
                 }
             }
-            let shiftFromMid: number = this.canvas3D.height/(this.lengthToBullet/1.5)
+            let shiftFromMid: number = canvas3DHeight/(this.lengthToBullet/1.5)
             let bulletCeil = mid - shiftFromMid
             let bulletFloor = mid+(mid-bulletCeil)
 

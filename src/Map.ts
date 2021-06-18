@@ -1,16 +1,17 @@
 import { Block } from './Block'
 import { BlockType } from './BlockType';
-import {MapSizeInfo} from './MapSizeInfo.interface'
 
 export class Map {
-    mapSizeInfo?: MapSizeInfo;
+    cellWidth?: number;
+    cellHeight?: number;
     blocks?: Block[][];
     canvas?: HTMLCanvasElement;
 
-    constructor(mapSizeInfo: MapSizeInfo, mapTemplate: Array<Array<BlockType>>, canvas: HTMLCanvasElement) {
+    constructor(cellWidth: number, cellHeight: number, mapTemplate: Array<Array<BlockType>>, canvas: HTMLCanvasElement) {
         this.blocks = new Array<Array<Block>>();
         this.canvas = canvas;
-        this.mapSizeInfo = mapSizeInfo;
+        this.cellWidth = cellWidth;
+        this.cellHeight = cellHeight;
 
         if(mapTemplate) {
             mapTemplate.forEach((row, iRow) => {
@@ -29,7 +30,7 @@ export class Map {
             row.forEach((block, iCol) => {
                 if (block.blockType === BlockType.Wall) {
                     context.beginPath();
-                    context.rect(this.mapSizeInfo.cellWidth*iCol, this.mapSizeInfo.cellHeight*iRow, this.mapSizeInfo.cellWidth, this.mapSizeInfo.cellHeight);
+                    context.rect(this.cellWidth*iCol, this.cellHeight*iRow, this.cellWidth, this.cellHeight);
                     context.stroke();
                 }
             });

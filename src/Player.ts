@@ -5,6 +5,7 @@ import { AudioControl } from './AudioContro';
 import {MapSizeInfo} from './MapSizeInfo.interface'
 import { Bullet } from './Bullet';
 import { Util } from './Util'
+import { AreaState } from './AreaState';
 
 //not using WASD because it was causing problems
 //specifically when crouching + moving forward/backward and then trying to rotatae right (wouldnt rotate but for some reason rotate left worked)
@@ -23,13 +24,11 @@ export class Player {
     crouchingAngularVel: number = 1.5;
 
     dirUVec?: UnitVector; //uses degree angle
-    map?: Map;
     playerCircleRadius: number = 2;
     keysState: {} = {};
-    canvas2D?: HTMLCanvasElement;
-    canvas3D?: HTMLCanvasElement;
     audioControl?: AudioControl;
-    mapSizeInfo?: MapSizeInfo;
+
+    areaState?: AreaState;
 
     curMousePosX?: number;
 
@@ -38,20 +37,17 @@ export class Player {
     util: Util = new Util();
 
     
-    constructor(xPos: number, yPos: number, startingDirUVec: UnitVector, map: Map, canvas2D: HTMLCanvasElement, canvas3D: HTMLCanvasElement, audioControl: AudioControl, mapSizeInfo: MapSizeInfo) {
+    constructor(xPos: number, yPos: number, startingDirUVec: UnitVector, areaState: AreaState, audioControl: AudioControl) {
         this.xPos= xPos;
         this.yPos = yPos;
         this.dirUVec = startingDirUVec;
-        this.map = map;
-        this.canvas2D = canvas2D;
-        this.canvas3D=canvas3D;
         this.audioControl = audioControl;
-        this.mapSizeInfo = mapSizeInfo;
+        this.areaState = areaState;
 
         window.addEventListener('click', () => {
-            let ang: number = Math.atan((this.curMousePosX-700/2)/350) + this.dirUVec.getDirRad();
+            let ang: number = Math.atan((this.curMousePosX-this.areaState.canvas3D.width/2)/350) + this.dirUVec.getDirRad();
             let uVec: UnitVector = new UnitVector(this.util.toDeg(ang));
-            this.bullets.push(new Bullet(this.getXMid(), this.getYMid(), uVec, this.canvas2D, this.mapSizeInfo, this.isPlayerCrouching()));
+            this.bullets.push(new Bullet(this.getXMid(), this.getYMid(), uVec, this.isPlayerCrouching(), this.areaState));
         });
 
         window.addEventListener('keyup', (e) => {
@@ -99,7 +95,7 @@ export class Player {
         });
         
         window.addEventListener('mousemove', (e) => {
-            let rect = this.canvas3D.getBoundingClientRect();
+            let rect = this.areaState.getCanvas3D().getBoundingClientRect();
             let xPos: number = e.clientX - rect.left;
             this.curMousePosX = xPos;
             console.log(e.clientX);
@@ -214,7 +210,7 @@ export class Player {
         let changeX: number = vel*this.dirUVec.getX();
         let changeY: number = vel*this.dirUVec.getY();
         
-        if (!this.util.inMapBlock(this.xPos + changeX, this.yPos + changeY, this.mapSizeInfo, this.map)) {
+        if (!this.util.inMapBlock(this.xPos + changeX, this.yPos + changeY, this.areaState.getMap(), this.areaState.getCellWidth(), this.areaState.getCellHeight())) {
             this.yPos += vel*this.dirUVec.getY();
             this.xPos += vel*this.dirUVec.getX();
         }
@@ -227,14 +223,14 @@ export class Player {
         let changeX: number = -vel*this.dirUVec.getX();
         let changeY: number = -vel*this.dirUVec.getY();
 
-        if (!this.util.inMapBlock(this.xPos + changeX, this.yPos + changeY, this.mapSizeInfo, this.map)) {
+        if (!this.util.inMapBlock(this.xPos + changeX, this.yPos + changeY, this.areaState.getMap(), this.areaState.getCellWidth(), this.areaState.getCellHeight())) {
             this.yPos -= vel*this.dirUVec.getY();
             this.xPos -= vel*this.dirUVec.getX();
         }       
     }
 
     draw2D(): void {
-        let ctx = this.canvas2D.getContext('2d');
+        let ctx = this.areaState.getCanvas2D().getContext('2d');
         let radAngle: number = this.dirUVec.getDirRad();
         
         ctx.translate(this.xPos, this.yPos);

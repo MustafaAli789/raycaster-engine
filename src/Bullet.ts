@@ -4,6 +4,7 @@ import { MapSizeInfo } from "./MapSizeInfo.interface";
 import { UnitVector } from "./UnitVector";
 import { Util } from './Util'
 import { Rectangle } from './Rectangle.interface'
+import { AreaState } from "./AreaState";
 
 enum ObjectHit {
     Player,
@@ -16,21 +17,19 @@ export class Bullet {
     xPos?: number;
     yPos?: number;
     uVecDir?: UnitVector;
-    velocity: number = 2;
-    canvas2D?: HTMLCanvasElement;
+    velocity: number = 3;
     dim: number = 5; //i.e square side length
-    mapSizeInfo?: MapSizeInfo;
     crouchedBullet: boolean = false; //if bullet was created while player crouched (needed for rendering height of bullet in 3d)
+
+    areaState?: AreaState;
 
     util: Util = new Util();
     
-
-    constructor(startX: number, startY: number, uVecDir: UnitVector, canvas2D: HTMLCanvasElement, mapSizeInfo: MapSizeInfo, crouchedBullet: boolean){
+    constructor(startX: number, startY: number, uVecDir: UnitVector, crouchedBullet: boolean, areaState: AreaState){
         this.xPos = startX-this.dim/2; //center bullet around player
         this.yPos = startY-this.dim/2; //center bullet around player
         this.uVecDir = uVecDir;
-        this.canvas2D = canvas2D;
-        this.mapSizeInfo = mapSizeInfo;
+        this.areaState = areaState;
         this.crouchedBullet = crouchedBullet;
     }
 
@@ -47,12 +46,12 @@ export class Bullet {
     }
 
     //the pont of this method is to project x even spaced vecs out of a side of the bullet (which is a square) and determine if any of those are in a player, ray, or wall
-    checkIfBulletSideInObject(side: string, map: Map, mapSizeInfo: MapSizeInfo): ObjectHit {
+    checkIfBulletSideInObject(side: string): ObjectHit {
 
         //this vec is in the dir of the side of the bullet we care about
         let uVec: UnitVector = new UnitVector(this.uVecDir.getDirDeg());
 
-        let mapHeight: number = mapSizeInfo.cellHeight*mapSizeInfo.rows;
+        let mapHeight: number = this.areaState.getCanvas2DHeight();
 
         //the roation algo uses normal cartesian convention of bottom left as (0, 0) so need to inv y
         let inverseY: number = mapHeight-this.yPos;
@@ -89,7 +88,7 @@ export class Bullet {
             projX = curPoint.x + uVec.getX()*projMag;
             projY = (mapHeight-curPoint.y) + uVec.getY()*projMag; //re inv y so it follows canvas convention
 
-            if (this.util.inMapBlock(projX, projY, mapSizeInfo, map)) {
+            if (this.util.inMapBlock(projX, projY, this.areaState.getMap(), this.areaState.getCellWidth(), this.areaState.getCellHeight())) {
                 return ObjectHit.Wall;
             }
         }
@@ -97,18 +96,18 @@ export class Bullet {
         return ObjectHit.None;
     }
 
-    checkObjectHit(map: Map, mapSizeInfo: MapSizeInfo): ObjectHit {
+    checkObjectHit(): ObjectHit {
 
-        if(this.checkIfBulletSideInObject('FORWARD', map, mapSizeInfo) === ObjectHit.Wall) {
+        if(this.checkIfBulletSideInObject('FORWARD') === ObjectHit.Wall) {
             return ObjectHit.Wall;
         }
-        if(this.checkIfBulletSideInObject('LEFT', map, mapSizeInfo) === ObjectHit.Wall) {
+        if(this.checkIfBulletSideInObject('LEFT') === ObjectHit.Wall) {
             return ObjectHit.Wall;
         }
-        if(this.checkIfBulletSideInObject('RIGHT', map, mapSizeInfo) === ObjectHit.Wall) {
+        if(this.checkIfBulletSideInObject('RIGHT') === ObjectHit.Wall) {
             return ObjectHit.Wall;
         }
-        if(this.checkIfBulletSideInObject('BOTTOM', map, mapSizeInfo) === ObjectHit.Wall) {
+        if(this.checkIfBulletSideInObject('BOTTOM') === ObjectHit.Wall) {
             return ObjectHit.Wall;
         }
 
@@ -117,7 +116,7 @@ export class Bullet {
 
     draw2D(): void {
         // expand out from each side a bit to see if in block
-        let ctx = this.canvas2D.getContext('2d');
+        let ctx = this.areaState.getCanvas2D().getContext('2d');
 
         ctx.fillStyle = 'grey';
 
@@ -142,9 +141,9 @@ export class Bullet {
 
     //accounts for rotation
     //A --> B --> C --> D is clockwise around rectangle from top left
-    getBoundingBox(mapSizeInfo: MapSizeInfo): Rectangle {
+    getBoundingBox(): Rectangle {
 
-        let mapHeight: number = mapSizeInfo.cellHeight*mapSizeInfo.rows;
+        let mapHeight: number = this.areaState.getCanvas2DHeight();
 
         //the roation algo uses normal cartesian convention of bottom left as (0, 0) so need to inv y
         let inverseY: number = mapHeight-this.yPos;

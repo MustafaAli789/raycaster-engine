@@ -49,9 +49,7 @@ export class Util {
         return u.x * v.x + u.y * v.y; 
     }
 
-    getMapBlockFromCoord(x: number, y: number, mapSizeInfo: MapSizeInfo): Point {
-        let cellWidth: number = mapSizeInfo.cellWidth;
-        let cellHeight: number = mapSizeInfo.cellHeight;
+    getMapBlockFromCoord(x: number, y: number, cellWidth: number, cellHeight: number): Point {
 
         let curXBlockIndex: number = Math.ceil(x/cellWidth)-1;
         let curYBlockIndex: number = Math.ceil(y/cellHeight)-1;
@@ -59,7 +57,7 @@ export class Util {
         return {x: curXBlockIndex, y: curYBlockIndex}
     }
 
-    inMapBlock(x: number, y: number, mapSizeInfo: MapSizeInfo, map: Map): boolean {
-        return map.getBlocks()[this.getMapBlockFromCoord(x, y, mapSizeInfo).y][this.getMapBlockFromCoord(x, y, mapSizeInfo).x].getBlockType() === BlockType.Wall;
+    inMapBlock(x: number, y: number, map: Map, cellWidth: number, cellHeight: number): boolean {
+        return map.getBlocks()[this.getMapBlockFromCoord(x, y, cellWidth, cellHeight).y][this.getMapBlockFromCoord(x, y, cellWidth, cellHeight).x].getBlockType() === BlockType.Wall;
     }
 }

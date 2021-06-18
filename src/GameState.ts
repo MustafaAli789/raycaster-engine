@@ -1,11 +1,8 @@
 import { AudioControl } from "./AudioContro";
-import { BlockType } from "./BlockType";
 import { Player } from "./Player";
-import { Map } from "./Map";
 import { UnitVector } from "./UnitVector";
-import {MapSizeInfo} from './MapSizeInfo.interface'
-import { Block } from "./Block";
 import { Bullet } from "./Bullet";
+import { AreaState } from "./AreaState";
 
 enum ObjectHit {
     Player,
@@ -17,21 +14,11 @@ enum ObjectHit {
 export class GameState {
     
     player?: Player;
-    canvas2D?: HTMLCanvasElement;
-    canvas3D?: HTMLCanvasElement;
-    map?: Map;
+    areaState?: AreaState;
 
-    mapSizeInfo?: MapSizeInfo;
-
-    constructor(canvas2D: HTMLCanvasElement, canvas3D: HTMLCanvasElement, mapTemplate: BlockType[][], audioControl: AudioControl) {
-        this.canvas2D = canvas2D;
-        this.canvas3D = canvas3D;
-        this.mapSizeInfo = {rows: mapTemplate.length, 
-                            cols: mapTemplate[0].length, 
-                            cellWidth: canvas2D.width/mapTemplate[0].length,
-                            cellHeight: canvas2D.height/mapTemplate.length}
-        this.map = new Map(this.mapSizeInfo, mapTemplate, canvas2D);
-        this.player =  new Player(300, 350, new UnitVector(270), this.map, canvas2D, canvas3D, audioControl, this.mapSizeInfo);
+    constructor(areaState: AreaState, audioControl: AudioControl) {
+        this.areaState = this.areaState;
+        this.player =  new Player(300, 350, new UnitVector(270), areaState, audioControl);
     }
 
     //Player info
@@ -55,18 +42,6 @@ export class GameState {
         return centerDir;
     }
 
-    //Map info
-    getMapSizeInfo(): MapSizeInfo {
-        return this.mapSizeInfo;
-    }
-    getMap(): Map {
-        return this.map;
-    }
-
-    //Drawing
-    drawMap(): void {
-        this.map.drawMap();
-    }
     drawPlayer(): void {
         this.player.draw2D();
     }
@@ -77,7 +52,7 @@ export class GameState {
 
         bullets.forEach((bullet, i) => {
             bullet.moveBullet();
-            if (bullet.checkObjectHit(this.map, this.mapSizeInfo) === ObjectHit.Wall) {
+            if (bullet.checkObjectHit() === ObjectHit.Wall) {
                 this.player.removeBullets(i);
             }
         });
@@ -90,10 +65,5 @@ export class GameState {
         //let bullets: Bullet[] = this.player.getBullets().slice(0);
         return this.player.getBullets();
     }
-
-    // drawBullets(): void {
-    //     this.player.getBullets().forEach(bullet => bullet.draw2D())
-    // }
-
 
 }
