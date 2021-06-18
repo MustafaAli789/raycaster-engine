@@ -106,14 +106,10 @@ export class Ray {
             if (!this.bulletHitEndX && !this.bulletHitEndY) {
                 for (let i =0; i<bullets.length; i++) {
                     let bullet: Bullet = bullets[i];
-                    if (Math.sqrt((curX-bullet.getX())**2+(curY-bullet.getY())**2)< 7) { //choosing 14 cause thats the diagonal of a square with side len 10
-                        let boundingBox: Rectangle = bullet.getBoundingBox();
-                        if (this.util.pointInRectangle({x: curX, y: curY}, boundingBox)) {
-                            this.bulletHitEndX = curX;
-                            this.bulletHitEndY = curY;
-                            this.crouchedBullet = bullet.getCrouchedBullet();
-                            break;
-                        }
+                    if (Math.sqrt((curX-bullet.getX())**2+(curY-bullet.getY())**2)< bullet.getDim()) { //choosing 14 cause thats the diagonal of a square with side len 10
+                        this.bulletHitEndX = curX;
+                        this.bulletHitEndY = curY;
+                        this.crouchedBullet = bullet.getCrouchedBullet();
                     }
                 }
             }
@@ -278,7 +274,7 @@ export class Ray {
 
             //wall shading based on ray length
             let color = {r: 224, g:86, b:0};
-            this.adjustColor(color, {r: -((this.lengthToBullet/3)*2.6), g: -this.lengthToBullet/3, b: 0})
+            this.adjustColor(color, {r: -((this.lengthToBullet/2)*2.6), g: -this.lengthToBullet/2, b: 0})
 
             ctx.fillStyle = 'white';
             ctx.fillRect(((sliceCol)*sliceWidth), bulletCeil-0.5, sliceWidth, (bulletFloor-bulletCeil)+1);
