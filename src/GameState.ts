@@ -1,4 +1,4 @@
-import { AudioControl } from "./AudioContro";
+import { AudioControl } from "./AudioControl";
 import { Player } from "./Player";
 import { UnitVector } from "./UnitVector";
 import { Bullet } from "./Bullet";
@@ -16,9 +16,9 @@ export class GameState {
     player?: Player;
     areaState?: AreaState;
 
-    constructor(areaState: AreaState, audioControl: AudioControl) {
+    constructor(areaState: AreaState, movementAudioControl: AudioControl, shootingAudioControl: AudioControl) {
         this.areaState = this.areaState;
-        this.player =  new Player(300, 350, new UnitVector(270), areaState, audioControl);
+        this.player =  new Player(300, 350, new UnitVector(270), areaState, movementAudioControl, shootingAudioControl);
     }
 
     //Player info

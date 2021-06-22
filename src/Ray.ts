@@ -256,7 +256,7 @@ export class Ray {
                     mid += crouchedBulletShift;
                 }
             }
-            let shiftFromMid: number = canvas3DHeight/(lengthToBullet/1.5)
+            let shiftFromMid: number = canvas3DHeight/(lengthToBullet)
             let bulletCeil = mid - shiftFromMid
             let bulletFloor = mid+(mid-bulletCeil)
     

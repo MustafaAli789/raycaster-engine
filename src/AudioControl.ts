@@ -17,7 +17,7 @@ export class AudioControl {
     constructor(audioElemId: string, playbackRate?: number, loop?: boolean, volume?: number) {
         this.playBackRate = playbackRate ? playbackRate : this.walkingPlayBackRate;
         this.audio = <HTMLAudioElement>document.getElementById(audioElemId)
-        this.audio.loop = loop ? loop : true;
+        this.audio.loop = loop != undefined ? loop : true;
         this.volume = volume ? volume : this.walkingVolume;
     }
 

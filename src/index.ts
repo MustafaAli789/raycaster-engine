@@ -1,5 +1,5 @@
 import { AreaState } from "./AreaState";
-import { AudioControl } from "./AudioContro";
+import { AudioControl } from "./AudioControl";
 import { BlockType } from "./Model/EBlockType";
 import { GameState } from "./GameState";
 import { Map } from "./Map";
@@ -12,7 +12,8 @@ let canvas3D: HTMLCanvasElement = document.querySelector('#canvasRight');
 
 //https://www.youtube.com/watch?v=dnRX_bHbYgs got audio from here
 //audio initial values
-let audioControl: AudioControl = new AudioControl('audio');
+let movementAudioControl: AudioControl = new AudioControl('movementAudioElem');
+let shootingAudioControl: AudioControl = new AudioControl('shootingAudioElem', 1, false, 1);
 
 let mapTemplate: BlockType[][] = [
     [BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall,BlockType.Wall],
@@ -32,7 +33,7 @@ let mapTemplate: BlockType[][] = [
     [BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall],
 ]
 const AState: AreaState = new AreaState(canvas2D, canvas3D, mapTemplate);
-const GState: GameState = new GameState(AState, audioControl);
+const GState: GameState = new GameState(AState, movementAudioControl, shootingAudioControl);
 const rays: Rays = new Rays(GState, AState);
 
 // window.addEventListener('mousemove', (e) => {
