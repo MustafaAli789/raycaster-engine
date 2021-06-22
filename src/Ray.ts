@@ -27,6 +27,8 @@ export class Ray {
 
     bulletCollisionArray?: {collisionX: number, collisionY:number, bullet: Bullet, length: number}[];
 
+    randY: number = Math.random()*(350-0); //the sky will never be past midway of screen
+
     constructor(gameState: GameState, areaState: AreaState, uVecDir: UnitVector) {
         this.gameState = gameState;
         this.areaState = areaState;
@@ -206,6 +208,13 @@ export class Ray {
 
         let distFromCeilToFloor: number = floor-ceiling;
 
+        //SKY COLUMN
+        ctx.fillStyle = 'black';
+        ctx.fillRect(((sliceCol)*sliceWidth), 0, sliceWidth, ceiling);
+
+        ctx.fillStyle = "white";
+        ctx.fillRect((sliceCol)*sliceWidth, this.randY, 1, 1);
+
         //wall shading based on ray length
         let color = {r:175, g:175, b:175};
         this.adjustColor(color, {r: -this.length/3.5, g: -this.length/3.5, b: -this.length/3.5})
@@ -227,10 +236,6 @@ export class Ray {
         //FLOOR COLUMN
         ctx.fillStyle = this.grd;
         ctx.fillRect(((sliceCol)*sliceWidth), floor, sliceWidth, canvas3DHeight-floor);
-
-        //SKY COLUMN
-        ctx.fillStyle = 'black';
-        ctx.fillRect(((sliceCol)*sliceWidth), 0, sliceWidth, ceiling);
 
         //BULLET COLUMN
                    
