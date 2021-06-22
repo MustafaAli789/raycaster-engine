@@ -13,7 +13,7 @@ export class Bullet {
     xPos?: number;
     yPos?: number;
     uVecDir?: UnitVector;
-    velocity: number = 3;
+    velocity: number = 0;
     dim: number = 3; //i.e square side length
     crouchedBullet: boolean = false; //if bullet was created while player crouched (needed for rendering height of bullet in 3d)
 

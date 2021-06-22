@@ -95,7 +95,6 @@ export class Player {
             let rect = this.areaState.getCanvas3D().getBoundingClientRect();
             let xPos: number = e.clientX - rect.left;
             this.curMousePosX = xPos;
-            console.log(e.clientX);
         })
 
         window.addEventListener('keydown', (e) => {

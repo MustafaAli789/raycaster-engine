@@ -25,12 +25,7 @@ export class Ray {
 
     util: Util = new Util();
 
-    //if these aren not null/undefined, it means a bullet was hit along the way
-    //it doesnt matter if theres like 20 bullets that a ray goes through, only the closest one will be seen anyway
-    bulletHitEndX?: number;
-    bulletHitEndY?: number;
-    lengthToBullet?: number;
-    crouchedBullet?: boolean;
+    bulletCollisionArray?: {collisionX: number, collisionY:number, bullet: Bullet, length: number}[];
 
     constructor(gameState: GameState, areaState: AreaState, uVecDir: UnitVector) {
         this.gameState = gameState;
@@ -96,21 +91,16 @@ export class Ray {
         let curX: number = this.gameState.getCenterX();
         let curY: number = this.gameState.getCenterY();
 
-        this.bulletHitEndX = null;
-        this.bulletHitEndY = null;
+        this.bulletCollisionArray = [];
 
         let bullets: Bullet[] = this.gameState.getAllBullets();
 
         while (!this.util.inMapBlock(curX, curY, this.areaState.getMap(), this.areaState.getCellWidth(), this.areaState.getCellHeight())) {
-
-            if (!this.bulletHitEndX && !this.bulletHitEndY) {
-                for (let i =0; i<bullets.length; i++) {
-                    let bullet: Bullet = bullets[i];
-                    if (Math.sqrt((curX-bullet.getX())**2+(curY-bullet.getY())**2)< bullet.getDim()) { 
-                        this.bulletHitEndX = curX;
-                        this.bulletHitEndY = curY;
-                        this.crouchedBullet = bullet.getCrouchedBullet();
-                    }
+            for (let i =bullets.length-1; i>=0; i--) {
+                let bullet: Bullet = bullets[i];
+                if (Math.sqrt((curX-bullet.getX())**2+(curY-bullet.getY())**2)< bullet.getDim()) { 
+                    this.bulletCollisionArray.push({collisionX: curX, collisionY: curY, bullet: bullet, length: null});
+                    bullets.splice(i, 1);
                 }
             }
 
@@ -141,11 +131,9 @@ export class Ray {
 
         this.calculateCollisionsAndIfEdge();
         this.length = this.getAdjustedLength(this.endX, this.endY);
-        
-        if (this.bulletHitEndX && this.bulletHitEndY){
-            this.lengthToBullet = this.getAdjustedLength(this.bulletHitEndX, this.bulletHitEndY)
-        }
 
+        this.bulletCollisionArray.forEach(coll => coll.length = this.getAdjustedLength(coll.collisionX, coll.collisionY))
+        
         //walking frame incr controls how many pix the screen moves up and down per frame (so walking count is b/w osscilates b/w 0 and 60) while player moves
         //so need to set it different dep on if crouching, walking or running
 
@@ -183,9 +171,9 @@ export class Ray {
         ctx.beginPath();
         ctx.moveTo(this.gameState.getCenterX(), this.gameState.getCenterY());
 
-        if(this.bulletHitEndX && this.bulletHitEndY) {
+        if(this.bulletCollisionArray.length > 0) {
             ctx.strokeStyle = 'blue';
-            ctx.lineTo(this.bulletHitEndX, this.bulletHitEndY);
+            ctx.lineTo(this.bulletCollisionArray[0].collisionX, this.bulletCollisionArray[0].collisionY);
             ctx.stroke();
             ctx.strokeStyle = 'green';
             ctx.lineTo(this.endX, this.endY);
@@ -236,7 +224,6 @@ export class Ray {
         //WALL COLUMN
         ctx.fillRect(((sliceCol)*sliceWidth), ceiling, sliceWidth, distFromCeilToFloor);
 
-
         //FLOOR COLUMN
         ctx.fillStyle = this.grd;
         ctx.fillRect(((sliceCol)*sliceWidth), floor, sliceWidth, canvas3DHeight-floor);
@@ -245,43 +232,43 @@ export class Ray {
         ctx.fillStyle = 'black';
         ctx.fillRect(((sliceCol)*sliceWidth), 0, sliceWidth, ceiling);
 
-        //calcualting bullet ceil and floor if bullet in ray viewa
-        if (this.bulletHitEndX && this.bulletHitEndY) {
-            
-            //cant use the ceiling and floor from above since the crouching and walking shift mess stuff up
-            //all we really want is a floor and ceiling rel to center of screen but crouchign shift makes stuff off center
-            //closer stuff will go up more than farther stuff and be even more off center
-            let ceil: number = canvas3DHeight/2 - canvas3DHeight/(this.length/12) + walkingFactor;
-            let flr: number = canvas3DHeight - ceil  + walkingFactor*2;
+        //BULLET COLUMN
+                   
+        //cant use the ceiling and floor from above since the crouching and walking shift mess stuff up
+        //all we really want is a floor and ceiling rel to center of screen but crouchign shift makes stuff off center
+        //closer stuff will go up more than farther stuff and be even more off center
+        let ceil: number = canvas3DHeight/2 - canvas3DHeight/(this.length/12) + walkingFactor;
+        let flr: number = canvas3DHeight - ceil  + walkingFactor*2;
 
-            let crouchedBulletShift: number = crouchingPixhift*(1/(this.lengthToBullet/12));
+        this.bulletCollisionArray.reverse().forEach(coll => {
 
+            let mid: number = (flr-ceil)/2+ceil;
+            let crouchedBullet: boolean = coll.bullet.getCrouchedBullet();
+            let lengthToBullet: number = coll.length!=null ? coll.length : 10; //safety mech
+            let crouchedBulletShift: number = crouchingPixhift*(1/(lengthToBullet/12));
 
-            let mid:number = (flr-ceil)/2+ceil;
             if (!this.gameState.isPlayerCrouching()) {
-                if (this.crouchedBullet) {
+                if (crouchedBullet) {
                     mid += crouchedBulletShift*-1;
                 }
             } else {
-                if (!this.crouchedBullet) {
+                if (!crouchedBullet) {
                     mid += crouchedBulletShift;
                 }
             }
-            let shiftFromMid: number = canvas3DHeight/(this.lengthToBullet/1.5)
+            let shiftFromMid: number = canvas3DHeight/(lengthToBullet/1.5)
             let bulletCeil = mid - shiftFromMid
             let bulletFloor = mid+(mid-bulletCeil)
-
+    
             //wall shading based on ray length
             let color = {r: 224, g:86, b:0};
-            this.adjustColor(color, {r: -((this.lengthToBullet/2)*2.6), g: -this.lengthToBullet/2, b: 0})
-
+            this.adjustColor(color, {r: -((lengthToBullet/2)*2.6), g: -lengthToBullet/2, b: 0})
+    
             ctx.fillStyle = 'white';
             ctx.fillRect(((sliceCol)*sliceWidth), bulletCeil-0.5, sliceWidth, (bulletFloor-bulletCeil)+1);
-
+    
             ctx.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`
             ctx.fillRect(((sliceCol)*sliceWidth), bulletCeil, sliceWidth, bulletFloor-bulletCeil);
-
-        }
-
+        });
     }
 }
