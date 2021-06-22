@@ -30,6 +30,7 @@ export class Map {
             row.forEach((block, iCol) => {
                 if (block.blockType === BlockType.Wall) {
                     context.beginPath();
+                    context.strokeStyle="black";
                     context.rect(this.cellWidth*iCol, this.cellHeight*iRow, this.cellWidth, this.cellHeight);
                     context.stroke();
                 }

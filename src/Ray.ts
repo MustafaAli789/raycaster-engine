@@ -106,7 +106,7 @@ export class Ray {
             if (!this.bulletHitEndX && !this.bulletHitEndY) {
                 for (let i =0; i<bullets.length; i++) {
                     let bullet: Bullet = bullets[i];
-                    if (Math.sqrt((curX-bullet.getX())**2+(curY-bullet.getY())**2)< bullet.getDim()) { //choosing 14 cause thats the diagonal of a square with side len 10
+                    if (Math.sqrt((curX-bullet.getX())**2+(curY-bullet.getY())**2)< bullet.getDim()) { 
                         this.bulletHitEndX = curX;
                         this.bulletHitEndY = curY;
                         this.crouchedBullet = bullet.getCrouchedBullet();
@@ -143,7 +143,7 @@ export class Ray {
         this.length = this.getAdjustedLength(this.endX, this.endY);
         
         if (this.bulletHitEndX && this.bulletHitEndY){
-            this.lengthToBullet = this.getAdjustedLength(this.bulletHitEndX, this.bulletHitEndY);
+            this.lengthToBullet = this.getAdjustedLength(this.bulletHitEndX, this.bulletHitEndY)
         }
 
         //walking frame incr controls how many pix the screen moves up and down per frame (so walking count is b/w osscilates b/w 0 and 60) while player moves
@@ -189,13 +189,12 @@ export class Ray {
             ctx.stroke();
             ctx.strokeStyle = 'green';
             ctx.lineTo(this.endX, this.endY);
+            ctx.stroke();
         } else {
+            ctx.strokeStyle = "black";
             ctx.lineTo(this.endX, this.endY);
+            ctx.stroke();
         }
-
-        ctx.lineTo(this.endX, this.endY);
-        ctx.stroke();
-        ctx.strokeStyle = "black";
     }
 
     adjustColor(startColor: {r, g, b}, colorChange: {r, g, b}) {

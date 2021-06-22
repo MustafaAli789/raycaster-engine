@@ -49,12 +49,13 @@ function main(): void {
     clearCanvas(canvas2D);
     clearCanvas(canvas3D);
     AState.drawMap();
-    GState.drawPlayer();
+    GState.drawPlayer2D();
     rays.setupRays();
     rays.draw2D();
-    GState.updateAndDrawBullets();
+    GState.updateAndDrawBullets2D();
     //GState.drawBullets();
     rays.draw3D();
+    GState.drawPlayerCrosshair();
 }
 
 setInterval(main, 1000/60);

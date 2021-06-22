@@ -42,12 +42,17 @@ export class GameState {
         return centerDir;
     }
 
-    drawPlayer(): void {
+    drawPlayer2D(): void {
         this.player.draw2D();
     }
 
+    drawPlayerCrosshair(): void {
+        this.player.drawCursor3D();
+    }
+
+
     //Updating and drawing bullets
-    updateAndDrawBullets():void {
+    updateAndDrawBullets2D():void {
         let bullets: Bullet[] = this.player.getBullets().slice(0);
 
         bullets.forEach((bullet, i) => {

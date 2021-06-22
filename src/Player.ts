@@ -228,11 +228,10 @@ export class Player {
 
     draw2D(): void {
         let ctx = this.areaState.getCanvas2D().getContext('2d');
-        let radAngle: number = this.dirUVec.getDirRad();
         
-        ctx.translate(this.xPos, this.yPos);
-        ctx.rotate(radAngle);
-        ctx.translate(-this.xPos, -this.yPos);
+        // ctx.translate(this.xPos, this.yPos);
+        // ctx.rotate(radAngle);
+        // ctx.translate(-this.xPos, -this.yPos);
         
         //ctx.fillRect(this.xPos, this.yPos, this.width, this.height);
        
@@ -240,8 +239,24 @@ export class Player {
         ctx.arc(this.xPos, this.yPos, this.playerCircleRadius, 0, 2 * Math.PI, false);
         ctx.fillStyle = 'green';
         ctx.fill();
+    }
+
+    drawCursor3D(): void {
+        let ctx = this.areaState.getCanvas3D().getContext('2d');
+        let midY: number = this.areaState.geCanvast3DHeight()/2;
+
+        let shortSide: number = 2;
+        let longSide: number = 20;
+        
+        let crossHairCenter = {x: this.curMousePosX+shortSide/2, y:midY }
+
+        ctx.fillStyle="white"
+        ctx.fillRect(this.curMousePosX, midY-longSide/2, shortSide, longSide);
+
+        ctx.fillRect(crossHairCenter.x-longSide/2, crossHairCenter.y-shortSide/2, longSide, shortSide)
 
         ctx.setTransform(1, 0, 0, 1, 0, 0);
+
     }
 
     getUnitVec(): UnitVector {
