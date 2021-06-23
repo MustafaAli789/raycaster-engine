@@ -20,7 +20,7 @@ export class GameState {
 
     constructor(areaState: AreaState, movementAudioControl: AudioControl, shootingAudioControl: AudioControl, enemyNpcs?: EnemyNpc[]) {
         this.areaState = this.areaState;
-        this.player =  new Player(300, 350, new UnitVector(270), areaState, movementAudioControl, shootingAudioControl);
+        this.player =  new Player(300, 400, new UnitVector(270), areaState, movementAudioControl, shootingAudioControl);
         if (enemyNpcs) {
             this.enemyNpcs = enemyNpcs;
         }
@@ -76,7 +76,7 @@ export class GameState {
     }
 
     getAllEnemies(): EnemyNpc[] {
-        return this.enemyNpcs;
+        return this.enemyNpcs.slice(0);
     }
 
 }

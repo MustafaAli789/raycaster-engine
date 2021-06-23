@@ -218,7 +218,7 @@ export class Ray {
         let canvas3DHeight = this.areaState.geCanvast3DHeight();
 
         //crouching and running animation
-        let crouchingPixhift: number = -250;
+        let crouchingPixhift: number = -300;
         let crouchingFactor: number = crouchingPixhift*(1/(this.length/12)); //need to factor in length of ray because clsoer stuff gets more tall than stuff thats further away
         let walkingFactor: number = this.walkingFrameCount/10;
 
@@ -280,32 +280,50 @@ export class Ray {
         collisionObjects.forEach(coll => {
 
             let mid: number = (flr-ceil)/2+ceil;
-            let crouchedBullet: boolean = (<Bullet>coll.objectHit).getCrouchedBullet();
-            let lengthToBullet: number = coll.length!=null ? coll.length : 10; //safety mech
-            let crouchedBulletShift: number = crouchingPixhift*(1/(lengthToBullet/12));
+            let lengthToCollidedObj: number = coll.length!=null ? coll.length : 10; //safety mech
+            let crouchedObjShift: number = crouchingPixhift*(1/(lengthToCollidedObj/12));
+            let shiftFromMid: number = -1;
+            let shiftFromMidCeilingFactor: number = 1;
+            let color = {r: 0, g:0, b:0};
 
-            if (!this.gameState.isPlayerCrouching()) {
-                if (crouchedBullet) {
-                    mid += crouchedBulletShift*-1;
+            //BULLET SPECIFIC
+            if (coll.objectHit instanceof Bullet) {
+                let crouchedBullet: boolean = (<Bullet>coll.objectHit).getCrouchedBullet();
+                if (!this.gameState.isPlayerCrouching()) {
+                    if (crouchedBullet) {
+                        mid += crouchedObjShift*-1;
+                    }
+                } else {
+                    if (!crouchedBullet) {
+                        mid += crouchedObjShift;
+                    }
                 }
-            } else {
-                if (!crouchedBullet) {
-                    mid += crouchedBulletShift;
+                shiftFromMid = canvas3DHeight/(lengthToCollidedObj)
+            } else if (coll.objectHit instanceof EnemyNpc) {
+                if (this.gameState.isPlayerCrouching()) {
+                    mid += crouchedObjShift;
                 }
+                shiftFromMid = canvas3DHeight/(lengthToCollidedObj/12)
+                shiftFromMidCeilingFactor = 4;
             }
-            let shiftFromMid: number = canvas3DHeight/(lengthToBullet)
-            let bulletCeil = mid - shiftFromMid
-            let bulletFloor = mid+(mid-bulletCeil)
+
+            let collidedObjCeil = mid-shiftFromMid/shiftFromMidCeilingFactor;
+            let collidedObjFloor = mid+shiftFromMid;
     
-            //wall shading based on ray length
-            let color = {r: 224, g:86, b:0};
-            this.adjustColor(color, {r: -((lengthToBullet/2)*2.6), g: -lengthToBullet/2, b: 0})
-    
-            ctx.fillStyle = 'white';
-            ctx.fillRect(((sliceCol)*sliceWidth), bulletCeil-0.5, sliceWidth, (bulletFloor-bulletCeil)+1);
+            //BULLET SPECIFIC
+            if (coll.objectHit instanceof Bullet) { 
+                color = {r: 224, g:86, b:0};
+                this.adjustColor(color, {r: -((lengthToCollidedObj/2)*2.6), g: -lengthToCollidedObj/2, b: 0})
+        
+                ctx.fillStyle = 'white';
+                ctx.fillRect(((sliceCol)*sliceWidth), collidedObjCeil-0.5, sliceWidth, (collidedObjFloor-collidedObjCeil)+1);
+            } else if (coll.objectHit instanceof EnemyNpc) {
+                color = {r: 224, g:86, b:0};
+                this.adjustColor(color, {r: -((lengthToCollidedObj/2)*2.6), g: -lengthToCollidedObj/2, b: 0})
+            }
     
             ctx.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`
-            ctx.fillRect(((sliceCol)*sliceWidth), bulletCeil, sliceWidth, bulletFloor-bulletCeil);
+            ctx.fillRect(((sliceCol)*sliceWidth), collidedObjCeil, sliceWidth, collidedObjFloor-collidedObjCeil);
         });
     }
 }

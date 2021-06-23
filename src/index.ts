@@ -33,7 +33,7 @@ let mapTemplate: BlockType[][] = [
     [BlockType.Wall, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Wall],
     [BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall],
 ]
-const enemyNpcs: EnemyNpc[] = [new EnemyNpc(-200, -200, new UnitVector(270))]
+const enemyNpcs: EnemyNpc[] = [new EnemyNpc(300, 350, new UnitVector(270))]
 const AState: AreaState = new AreaState(canvas2D, canvas3D, mapTemplate);
 const GState: GameState = new GameState(AState, movementAudioControl, shootingAudioControl, enemyNpcs);
 const rays: Rays = new Rays(GState, AState);
