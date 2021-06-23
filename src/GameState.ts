@@ -47,16 +47,16 @@ export class GameState {
         return centerDir;
     }
 
+    //Drawing player stuff
     drawPlayer2D(): void {
         this.player.draw2D();
     }
-
     drawPlayerCrosshair(): void {
         this.player.drawCursor3D();
     }
 
-    //Updating and drawing bullets
-    updateAndDrawBullets2D():void {
+    //Updating bullets
+    updateBullets():void {
         let bullets: Bullet[] = this.player.getBullets().slice(0);
 
         bullets.forEach((bullet, i) => {
@@ -65,9 +65,11 @@ export class GameState {
                 this.player.removeBullets(i);
             }
         });
+    }
 
-        //gonna draw even after collision
-        bullets.forEach(bullet => bullet.draw2D())
+    //drawing bullets
+    drawBullets2D(): void {
+        this.player.getBullets().forEach(bullet => bullet.draw2D())
     }
 
     getAllBullets(): Bullet[] {
@@ -77,6 +79,13 @@ export class GameState {
 
     getAllEnemies(): EnemyNpc[] {
         return this.enemyNpcs.slice(0);
+    }
+
+    //Updating enemy npcs
+    updateEnemyNpcs(): void {
+        this.enemyNpcs.forEach(enemy => {
+            enemy.move();
+        })
     }
 
 }

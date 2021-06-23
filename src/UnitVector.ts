@@ -16,6 +16,13 @@ export class UnitVector {
         this.y = Math.sin(this.toRad(this.dir));
     }
 
+    //change is in deg
+    setDir(newDir: number): void {
+        this.dir = newDir;
+        this.x = Math.cos(this.toRad(this.dir));
+        this.y = Math.sin(this.toRad(this.dir));
+    }
+
     toRad(deg: number): number {
         return deg*Math.PI/180;
     }

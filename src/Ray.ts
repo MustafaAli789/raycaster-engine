@@ -304,7 +304,7 @@ export class Ray {
                     mid += crouchedObjShift;
                 }
                 shiftFromMid = canvas3DHeight/(lengthToCollidedObj/12)
-                shiftFromMidCeilingFactor = 4;
+                shiftFromMidCeilingFactor = 4; // we want the enemy npc to be a lil over half the height of wall
             }
 
             let collidedObjCeil = mid-shiftFromMid/shiftFromMidCeilingFactor;

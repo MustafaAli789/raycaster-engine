@@ -33,8 +33,8 @@ let mapTemplate: BlockType[][] = [
     [BlockType.Wall, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Wall],
     [BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall],
 ]
-const enemyNpcs: EnemyNpc[] = [new EnemyNpc(300, 350, new UnitVector(270))]
 const AState: AreaState = new AreaState(canvas2D, canvas3D, mapTemplate);
+const enemyNpcs: EnemyNpc[] = [new EnemyNpc(300, 350, new UnitVector(45), AState)]
 const GState: GameState = new GameState(AState, movementAudioControl, shootingAudioControl, enemyNpcs);
 const rays: Rays = new Rays(GState, AState);
 
@@ -52,11 +52,14 @@ function main(): void {
     clearCanvas(canvas2D);
     clearCanvas(canvas3D);
     AState.drawMap();
+
     GState.drawPlayer2D();
     rays.setupRays();
     rays.draw2D();
-    GState.updateAndDrawBullets2D();
-    //GState.drawBullets();
+    GState.updateBullets();
+    GState.drawBullets2D();
+    GState.updateEnemyNpcs();
+
     rays.draw3D();
     GState.drawPlayerCrosshair();
 }
