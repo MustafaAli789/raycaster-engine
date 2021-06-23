@@ -48,6 +48,17 @@ export class EnemyNpc {
         return false;
     }
 
+    draw2D(): void {
+        let ctx = this.areaState.getCanvas2D().getContext('2d');
+
+        ctx.fillStyle = 'red';
+
+        ctx.moveTo(this.xPos, this.yPos);
+        ctx.beginPath();
+        ctx.arc(this.xPos, this.yPos, this.dim, 0, 2*Math.PI);
+        ctx.fill();
+    }
+
     getX(): number {
         return this.xPos;
     }

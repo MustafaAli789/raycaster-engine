@@ -88,4 +88,8 @@ export class GameState {
         })
     }
 
+    drawEnemyNpcs2D(): void {
+        this.enemyNpcs.forEach(enemyNpc => enemyNpc.draw2D());
+    }
+
 }

@@ -57,8 +57,9 @@ function main(): void {
     rays.setupRays();
     rays.draw2D();
     GState.updateBullets();
-    GState.drawBullets2D();
     GState.updateEnemyNpcs();
+    GState.drawEnemyNpcs2D();
+    GState.drawBullets2D();
 
     rays.draw3D();
     GState.drawPlayerCrosshair();

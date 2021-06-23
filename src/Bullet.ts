@@ -55,7 +55,6 @@ export class Bullet {
     }
 
     draw2D(): void {
-        // expand out from each side a bit to see if in block
         let ctx = this.areaState.getCanvas2D().getContext('2d');
 
         ctx.fillStyle = 'grey';
