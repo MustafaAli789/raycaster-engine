@@ -7,6 +7,14 @@ import { Util } from './Util'
 import { Bullet } from "./Bullet";
 import { Rectangle } from './Model/IRectangle'
 import { AreaState } from "./AreaState";
+import { EnemyNpc } from "./EnemyNpc";
+
+interface CollisionObject {
+    collisionX: number,
+    collisionY: number,
+    objectHit: Bullet | EnemyNpc,
+    length: number
+}
 
 export class Ray {
     uVecDir?: UnitVector;
@@ -25,7 +33,8 @@ export class Ray {
 
     util: Util = new Util();
 
-    bulletCollisionArray?: {collisionX: number, collisionY:number, bullet: Bullet, length: number}[];
+    bulletCollisionArray?: CollisionObject[];
+    enemyNpcCollisionArray?: CollisionObject[];
 
     randY: number = Math.random()*(350-0); //the sky will never be past midway of screen
 
@@ -94,15 +103,25 @@ export class Ray {
         let curY: number = this.gameState.getCenterY();
 
         this.bulletCollisionArray = [];
+        this.enemyNpcCollisionArray = [];
 
         let bullets: Bullet[] = this.gameState.getAllBullets();
+        let enemyNpcs: EnemyNpc[] = this.gameState.getAllEnemies();
 
         while (!this.util.inMapBlock(curX, curY, this.areaState.getMap(), this.areaState.getCellWidth(), this.areaState.getCellHeight())) {
             for (let i =bullets.length-1; i>=0; i--) {
                 let bullet: Bullet = bullets[i];
                 if (Math.sqrt((curX-bullet.getX())**2+(curY-bullet.getY())**2)< bullet.getDim()) { 
-                    this.bulletCollisionArray.push({collisionX: curX, collisionY: curY, bullet: bullet, length: null});
+                    this.bulletCollisionArray.push({collisionX: curX, collisionY: curY, objectHit: bullet, length: null});
                     bullets.splice(i, 1);
+                }
+            }
+
+            for (let i =enemyNpcs.length-1; i>=0; i--) {
+                let enemyNpc: EnemyNpc = enemyNpcs[i];
+                if (Math.sqrt((curX-enemyNpc.getX())**2+(curY-enemyNpc.getY())**2)< enemyNpc.getDim()) { 
+                    this.enemyNpcCollisionArray.push({collisionX: curX, collisionY: curY, objectHit: enemyNpc, length: null});
+                    enemyNpcs.splice(i, 1);
                 }
             }
 
@@ -135,7 +154,8 @@ export class Ray {
         this.length = this.getAdjustedLength(this.endX, this.endY);
 
         this.bulletCollisionArray.forEach(coll => coll.length = this.getAdjustedLength(coll.collisionX, coll.collisionY))
-        
+        this.enemyNpcCollisionArray.forEach(coll => coll.length = this.getAdjustedLength(coll.collisionX, coll.collisionY))
+
         //walking frame incr controls how many pix the screen moves up and down per frame (so walking count is b/w osscilates b/w 0 and 60) while player moves
         //so need to set it different dep on if crouching, walking or running
 
@@ -212,6 +232,8 @@ export class Ray {
         ctx.fillStyle = 'black';
         ctx.fillRect(((sliceCol)*sliceWidth), 0, sliceWidth, ceiling);
 
+
+        //STARS IN SKY
         ctx.fillStyle = "white";
         ctx.fillRect((sliceCol)*sliceWidth, this.randY, 1, 1);
 
@@ -237,7 +259,7 @@ export class Ray {
         ctx.fillStyle = this.grd;
         ctx.fillRect(((sliceCol)*sliceWidth), floor, sliceWidth, canvas3DHeight-floor);
 
-        //BULLET COLUMN
+        //BULLET + ENEMY NPC COLUMN
                    
         //cant use the ceiling and floor from above since the crouching and walking shift mess stuff up
         //all we really want is a floor and ceiling rel to center of screen but crouchign shift makes stuff off center
@@ -245,10 +267,20 @@ export class Ray {
         let ceil: number = canvas3DHeight/2 - canvas3DHeight/(this.length/12) + walkingFactor;
         let flr: number = canvas3DHeight - ceil  + walkingFactor*2;
 
-        this.bulletCollisionArray.reverse().forEach(coll => {
+        let collisionObjects: CollisionObject[] = this.bulletCollisionArray.concat(this.enemyNpcCollisionArray);
+        collisionObjects.sort((a, b) => {
+            if (a.length < b.length) {
+                return 1;
+            } else if (a.length > b.length) {
+                return -1;
+            } 
+            return 0;
+        })
+
+        collisionObjects.forEach(coll => {
 
             let mid: number = (flr-ceil)/2+ceil;
-            let crouchedBullet: boolean = coll.bullet.getCrouchedBullet();
+            let crouchedBullet: boolean = (<Bullet>coll.objectHit).getCrouchedBullet();
             let lengthToBullet: number = coll.length!=null ? coll.length : 10; //safety mech
             let crouchedBulletShift: number = crouchingPixhift*(1/(lengthToBullet/12));
 

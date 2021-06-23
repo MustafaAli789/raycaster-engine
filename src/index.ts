@@ -6,6 +6,7 @@ import { Map } from "./Map";
 import { Player } from "./Player";
 import { Rays } from "./Rays";
 import { UnitVector } from "./UnitVector";
+import { EnemyNpc } from "./EnemyNpc";
 
 let canvas2D: HTMLCanvasElement = document.querySelector('#canvasLeft');
 let canvas3D: HTMLCanvasElement = document.querySelector('#canvasRight');
@@ -32,8 +33,9 @@ let mapTemplate: BlockType[][] = [
     [BlockType.Wall, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Empty, BlockType.Wall],
     [BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall],
 ]
+const enemyNpcs: EnemyNpc[] = [new EnemyNpc(-200, -200, new UnitVector(270))]
 const AState: AreaState = new AreaState(canvas2D, canvas3D, mapTemplate);
-const GState: GameState = new GameState(AState, movementAudioControl, shootingAudioControl);
+const GState: GameState = new GameState(AState, movementAudioControl, shootingAudioControl, enemyNpcs);
 const rays: Rays = new Rays(GState, AState);
 
 // window.addEventListener('mousemove', (e) => {

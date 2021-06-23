@@ -3,6 +3,7 @@ import { Player } from "./Player";
 import { UnitVector } from "./UnitVector";
 import { Bullet } from "./Bullet";
 import { AreaState } from "./AreaState";
+import { EnemyNpc } from "./EnemyNpc";
 
 enum ObjectHit {
     Player,
@@ -14,11 +15,15 @@ enum ObjectHit {
 export class GameState {
     
     player?: Player;
+    enemyNpcs?: EnemyNpc[];
     areaState?: AreaState;
 
-    constructor(areaState: AreaState, movementAudioControl: AudioControl, shootingAudioControl: AudioControl) {
+    constructor(areaState: AreaState, movementAudioControl: AudioControl, shootingAudioControl: AudioControl, enemyNpcs?: EnemyNpc[]) {
         this.areaState = this.areaState;
         this.player =  new Player(300, 350, new UnitVector(270), areaState, movementAudioControl, shootingAudioControl);
+        if (enemyNpcs) {
+            this.enemyNpcs = enemyNpcs;
+        }
     }
 
     //Player info
@@ -50,7 +55,6 @@ export class GameState {
         this.player.drawCursor3D();
     }
 
-
     //Updating and drawing bullets
     updateAndDrawBullets2D():void {
         let bullets: Bullet[] = this.player.getBullets().slice(0);
@@ -69,6 +73,10 @@ export class GameState {
     getAllBullets(): Bullet[] {
         let bullets: Bullet[] = this.player.getBullets().slice(0);
         return bullets;
+    }
+
+    getAllEnemies(): EnemyNpc[] {
+        return this.enemyNpcs;
     }
 
 }
