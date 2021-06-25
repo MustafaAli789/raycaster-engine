@@ -34,8 +34,7 @@ let mapTemplate: BlockType[][] = [
     [BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall, BlockType.Wall],
 ]
 const AState: AreaState = new AreaState(canvas2D, canvas3D, mapTemplate);
-const enemyNpcs: EnemyNpc[] = [new EnemyNpc(300, 350, new UnitVector(45), AState)]
-const GState: GameState = new GameState(AState, movementAudioControl, shootingAudioControl, enemyNpcs);
+const GState: GameState = new GameState(AState, movementAudioControl, shootingAudioControl);
 const rays: Rays = new Rays(GState, AState);
 
 // window.addEventListener('mousemove', (e) => {

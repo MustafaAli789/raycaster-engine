@@ -20,12 +20,13 @@ export class GameState {
     areaState?: AreaState;
     util: Util = new Util();
 
-    constructor(areaState: AreaState, movementAudioControl: AudioControl, shootingAudioControl: AudioControl, enemyNpcs?: EnemyNpc[]) {
-        this.areaState = this.areaState;
+    totNumEnemiesInWave: number = 1;
+    numEnemiesRemaining: number = 1;
+
+    constructor(areaState: AreaState, movementAudioControl: AudioControl, shootingAudioControl: AudioControl) {
+        this.areaState = areaState;
         this.player =  new Player(300, 400, new UnitVector(270), areaState, movementAudioControl, shootingAudioControl);
-        if (enemyNpcs) {
-            this.enemyNpcs = enemyNpcs;
-        }
+        this.enemyNpcs = [new EnemyNpc(300, 350, new UnitVector(45), areaState)];
     }
 
     //Player info
@@ -115,8 +116,18 @@ export class GameState {
                 let distFromEnemyCenterToBulletCenter: number = this.util.dist({x: enemy.getX(), y: enemy.getY()}, {x: bullet.getX(), y:bullet.getY()});
                 if (distFromEnemyCenterToBulletCenter < (enemy.getDim() + bullet.getDim())) { 
                     this.enemyNpcs.splice(i, 1);
+                    this.numEnemiesRemaining--;
                     break;
                 }
+            }
+        }
+
+        //new wave
+        if (this.numEnemiesRemaining === 0) {
+            this.totNumEnemiesInWave++;
+            this.numEnemiesRemaining = this.totNumEnemiesInWave;
+            for (let i = 0; i<this.totNumEnemiesInWave; i++) {
+                this.enemyNpcs.push(new EnemyNpc(300, 350, new UnitVector(Math.random()*360), this.areaState));
             }
         }
     }

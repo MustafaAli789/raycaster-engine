@@ -7,7 +7,7 @@ export class EnemyNpc {
     yPos?: number;
     dim: number = 5;
     uVecDir?: UnitVector;
-    velocity: number = 0;
+    velocity: number = 2;
     areaState?: AreaState;
 
     util: Util = new Util();
