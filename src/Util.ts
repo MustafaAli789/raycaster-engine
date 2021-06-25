@@ -59,4 +59,8 @@ export class Util {
     inMapBlock(x: number, y: number, map: Map, cellWidth: number, cellHeight: number): boolean {
         return map.getBlocks()[this.getMapBlockFromCoord(x, y, cellWidth, cellHeight).y][this.getMapBlockFromCoord(x, y, cellWidth, cellHeight).x].getBlockType() === BlockType.Wall;
     }
+
+    dist(point1: Point, point2: Point): number {
+        return Math.sqrt((point1.x - point2.x)**2+(point1.y-point2.y)**2)
+    }
 }

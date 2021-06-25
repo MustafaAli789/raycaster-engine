@@ -304,7 +304,9 @@ export class Ray {
                     mid += crouchedObjShift;
                 }
                 shiftFromMid = canvas3DHeight/(lengthToCollidedObj/12)
-                shiftFromMidCeilingFactor = 4; // we want the enemy npc to be a lil over half the height of wall
+
+                //enemy npc will be 3/4 of the wall tall but 5/8th will be green part and the other 1/8 aboe mid of wall will be red head part hence the factor of 8 here
+                shiftFromMidCeilingFactor = 8; 
             }
 
             let collidedObjCeil = mid-shiftFromMid/shiftFromMidCeilingFactor;
@@ -313,13 +315,27 @@ export class Ray {
             //BULLET SPECIFIC
             if (coll.objectHit instanceof Bullet) { 
                 color = {r: 224, g:86, b:0};
-                this.adjustColor(color, {r: -((lengthToCollidedObj/2)*2.6), g: -lengthToCollidedObj/2, b: 0})
+                this.adjustColor(color, {r: -lengthToCollidedObj/2, g: -lengthToCollidedObj/2*0.4, b: 0})
         
                 ctx.fillStyle = 'white';
                 ctx.fillRect(((sliceCol)*sliceWidth), collidedObjCeil-0.5, sliceWidth, (collidedObjFloor-collidedObjCeil)+1);
             } else if (coll.objectHit instanceof EnemyNpc) {
-                color = {r: 224, g:86, b:0};
-                this.adjustColor(color, {r: -((lengthToCollidedObj/2)*2.6), g: -lengthToCollidedObj/2, b: 0})
+
+                //drawing a bigger column behind main one to be able to display the red head part
+                let headCeiling: number = mid-shiftFromMid/(shiftFromMidCeilingFactor/2);
+                color = {r: 255, g:98, b:0};
+                this.adjustColor(color, {r: -(lengthToCollidedObj/2), g: -lengthToCollidedObj/2*0.4, b: 0})
+
+                ctx.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`;
+                ctx.fillRect(((sliceCol)*sliceWidth), headCeiling, sliceWidth, (collidedObjFloor-headCeiling));
+
+                //little black line at bottom just for border
+                ctx.fillStyle = "black";
+                ctx.fillRect(((sliceCol)*sliceWidth), collidedObjCeil, sliceWidth, (collidedObjFloor-collidedObjCeil)+0.5);
+
+                //green part/body coloring
+                color = {r: 0, g:219, b:22};
+                this.adjustColor(color, {r: 0, g: -lengthToCollidedObj/2, b: -lengthToCollidedObj/2*0.1})
             }
     
             ctx.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`

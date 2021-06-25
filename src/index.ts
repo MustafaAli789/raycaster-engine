@@ -56,6 +56,8 @@ function main(): void {
     GState.drawPlayer2D();
     rays.setupRays();
     rays.draw2D();
+
+    GState.checkExternalCollisions();
     GState.updateBullets();
     GState.updateEnemyNpcs();
     GState.drawEnemyNpcs2D();

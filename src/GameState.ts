@@ -4,6 +4,7 @@ import { UnitVector } from "./UnitVector";
 import { Bullet } from "./Bullet";
 import { AreaState } from "./AreaState";
 import { EnemyNpc } from "./EnemyNpc";
+import { Util } from "./Util";
 
 enum ObjectHit {
     Player,
@@ -17,6 +18,7 @@ export class GameState {
     player?: Player;
     enemyNpcs?: EnemyNpc[];
     areaState?: AreaState;
+    util: Util = new Util();
 
     constructor(areaState: AreaState, movementAudioControl: AudioControl, shootingAudioControl: AudioControl, enemyNpcs?: EnemyNpc[]) {
         this.areaState = this.areaState;
@@ -55,13 +57,14 @@ export class GameState {
         this.player.drawCursor3D();
     }
 
-    //Updating bullets
+    //Updating bullets position
+    //bullet only responsible for its own collision with wall
     updateBullets():void {
         let bullets: Bullet[] = this.player.getBullets().slice(0);
 
         bullets.forEach((bullet, i) => {
             bullet.moveBullet();
-            if (bullet.checkObjectHit() === ObjectHit.Wall) {
+            if (bullet.checkWallHit()) {
                 this.player.removeBullets(i);
             }
         });
@@ -72,16 +75,8 @@ export class GameState {
         this.player.getBullets().forEach(bullet => bullet.draw2D())
     }
 
-    getAllBullets(): Bullet[] {
-        let bullets: Bullet[] = this.player.getBullets().slice(0);
-        return bullets;
-    }
-
-    getAllEnemies(): EnemyNpc[] {
-        return this.enemyNpcs.slice(0);
-    }
-
-    //Updating enemy npcs
+    //Updating enemy npcs position
+    //enemy only responsible for its own collision with wall
     updateEnemyNpcs(): void {
         this.enemyNpcs.forEach(enemy => {
             enemy.move();
@@ -90,6 +85,40 @@ export class GameState {
 
     drawEnemyNpcs2D(): void {
         this.enemyNpcs.forEach(enemyNpc => enemyNpc.draw2D());
+    }
+
+
+    //Entity getters
+    getAllBullets(): Bullet[] {
+        let bullets: Bullet[] = this.player.getBullets().slice(0);
+        return bullets;
+    }
+    getAllEnemies(): EnemyNpc[] {
+        return this.enemyNpcs.slice(0);
+    }
+
+    //EXTERNAL COLLISIONS (b/w enemy and player and bullet and enemy)
+    checkExternalCollisions(): void {
+        //checking enemy with player collision
+        this.enemyNpcs.forEach(enemy => {
+            let distFromEnemyCenterToPlayerCenter: number = this.util.dist({x: enemy.getX(), y: enemy.getY()}, {x: this.player.getXMid(), y:this.player.getYMid()});
+            if (distFromEnemyCenterToPlayerCenter < enemy.getDim() + 0) { //the + 0 should really be the dim of the player but for now the player is just a point
+                this.player.reset();
+            }
+        })
+
+        let bullets: Bullet[] = this.getAllBullets();
+        for (let i = this.enemyNpcs.length-1; i>=0; i--) {
+            let enemy: EnemyNpc = this.enemyNpcs[i];
+            for (let j = 0; j<bullets.length; j++) {
+                let bullet: Bullet = bullets[j];
+                let distFromEnemyCenterToBulletCenter: number = this.util.dist({x: enemy.getX(), y: enemy.getY()}, {x: bullet.getX(), y:bullet.getY()});
+                if (distFromEnemyCenterToBulletCenter < (enemy.getDim() + bullet.getDim())) { 
+                    this.enemyNpcs.splice(i, 1);
+                    break;
+                }
+            }
+        }
     }
 
 }

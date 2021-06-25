@@ -5,9 +5,9 @@ import { Util } from "./Util";
 export class EnemyNpc {
     xPos?: number;
     yPos?: number;
-    dim: number = 3;
+    dim: number = 5;
     uVecDir?: UnitVector;
-    velocity: number = 2;
+    velocity: number = 0;
     areaState?: AreaState;
 
     util: Util = new Util();

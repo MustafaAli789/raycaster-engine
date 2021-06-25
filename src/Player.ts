@@ -229,6 +229,12 @@ export class Player {
         }       
     }
 
+    reset(): void {
+        this.xPos = 300;
+        this.yPos = 400;
+        this.dirUVec.setDir(270);
+    }
+
     draw2D(): void {
         let ctx = this.areaState.getCanvas2D().getContext('2d');
         

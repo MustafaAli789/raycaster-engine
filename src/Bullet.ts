@@ -2,13 +2,6 @@ import { UnitVector } from "./UnitVector";
 import { Util } from './Util'
 import { AreaState } from "./AreaState";
 
-enum ObjectHit {
-    Player,
-    Wall,
-    Ray,
-    None
-}
-
 export class Bullet {
     xPos?: number;
     yPos?: number;
@@ -34,7 +27,7 @@ export class Bullet {
         this.yPos += this.velocity*this.uVecDir.getY();
     }
 
-    checkObjectHit(): ObjectHit {
+    checkWallHit(): boolean {
 
         let tempUVec: UnitVector = new UnitVector(this.uVecDir.getDirDeg());
         let projMag: number = 0.01;
@@ -46,12 +39,12 @@ export class Bullet {
             let x: number = this.xPos+tempUVec.getX()*(this.dim+projMag);
             let y: number = this.yPos+tempUVec.getY()*(this.dim+projMag);
             if (this.util.inMapBlock(x, y, this.areaState.getMap(), this.areaState.getCellWidth(), this.areaState.getCellHeight())) {
-                return ObjectHit.Wall;
+                return true;
             }
             tempUVec.updateDir(incr);
         }
 
-        return ObjectHit.None;
+        return false;
     }
 
     draw2D(): void {
