@@ -116,6 +116,7 @@ export class GameState {
                 let distFromEnemyCenterToBulletCenter: number = this.util.dist({x: enemy.getX(), y: enemy.getY()}, {x: bullet.getX(), y:bullet.getY()});
                 if (distFromEnemyCenterToBulletCenter < (enemy.getDim() + bullet.getDim())) { 
                     this.enemyNpcs.splice(i, 1);
+                    this.player.removeBullets(j);
                     this.numEnemiesRemaining--;
                     break;
                 }
