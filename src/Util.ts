@@ -6,6 +6,10 @@ interface Point {
     x: number, y: number
 }
 
+interface Position {
+    col: number, row: number
+}
+
 interface Vector {
     x: number, y: number
 }
@@ -48,16 +52,16 @@ export class Util {
         return u.x * v.x + u.y * v.y; 
     }
 
-    getMapBlockFromCoord(x: number, y: number, cellWidth: number, cellHeight: number): Point {
+    getMapBlockFromCoord(x: number, y: number, cellWidth: number, cellHeight: number): Position {
 
         let curXBlockIndex: number = Math.ceil(x/cellWidth)-1;
         let curYBlockIndex: number = Math.ceil(y/cellHeight)-1;
 
-        return {x: curXBlockIndex, y: curYBlockIndex}
+        return {col: curXBlockIndex, row: curYBlockIndex}
     }
 
     inMapBlock(x: number, y: number, map: Map, cellWidth: number, cellHeight: number): boolean {
-        return map.getBlocks()[this.getMapBlockFromCoord(x, y, cellWidth, cellHeight).y][this.getMapBlockFromCoord(x, y, cellWidth, cellHeight).x].getBlockType() === BlockType.Wall;
+        return map.getBlocks()[this.getMapBlockFromCoord(x, y, cellWidth, cellHeight).row][this.getMapBlockFromCoord(x, y, cellWidth, cellHeight).col].getBlockType() === BlockType.Wall;
     }
 
     dist(point1: Point, point2: Point): number {

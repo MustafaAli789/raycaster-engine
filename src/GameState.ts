@@ -80,7 +80,7 @@ export class GameState {
     //enemy only responsible for its own collision with wall
     updateEnemyNpcs(): void {
         this.enemyNpcs.forEach(enemy => {
-            enemy.move();
+            enemy.move(this.player.getXMid(), this.player.getYMid());
         })
     }
 

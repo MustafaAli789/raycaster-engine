@@ -1,14 +1,30 @@
 import { AreaState } from "./AreaState";
+import { AStarSearch } from "./AStarSearch";
 import { UnitVector } from "./UnitVector";
 import { Util } from "./Util";
+
+interface Position {
+    row: number,
+    col: number
+}
+
+interface Node {
+    id: string,
+    position: Position,
+    g_score: number,
+    h_score: number,
+    f_score: number,
+    parent_Node?: Node
+}
 
 export class EnemyNpc {
     xPos?: number;
     yPos?: number;
     dim: number = 5;
     uVecDir?: UnitVector;
-    velocity: number = 2;
+    velocity: number = 0.5;
     areaState?: AreaState;
+    searcher?: AStarSearch;
 
     util: Util = new Util();
 
@@ -17,9 +33,17 @@ export class EnemyNpc {
         this.yPos = initialY;
         this.uVecDir = initialDir;
         this.areaState = areaState;
+
+        this.searcher = new AStarSearch(areaState);
     }
 
-    move(): void {
+    move(playerX: number, playerY: number): void {
+
+        let playerCell: Position = this.util.getMapBlockFromCoord(playerX, playerY, this.areaState.getCellWidth(), this.areaState.getCellHeight());
+        let enemyCell: Position = this.util.getMapBlockFromCoord(this.xPos, this.yPos, this.areaState.getCellWidth(), this.areaState.getCellHeight());
+        this.searcher.resetSearcher();
+        let path: Node[] = this.searcher.calculatePath(enemyCell.row, enemyCell.col, playerCell.row, playerCell.col);
+
         this.xPos += this.uVecDir.getX()*this.velocity;
         this.yPos += this.uVecDir.getY()*this.velocity;
 

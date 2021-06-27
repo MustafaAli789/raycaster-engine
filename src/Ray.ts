@@ -133,7 +133,7 @@ export class Ray {
         this.endY = curY;
 
         let curBlock = this.util.getMapBlockFromCoord(curX, curY, this.areaState.getCellWidth(), this.areaState.getCellHeight());
-        let blockHit: Block = this.areaState.getMap().getBlocks()[curBlock.y][curBlock.x];
+        let blockHit: Block = this.areaState.getMap().getBlocks()[curBlock.row][curBlock.col];
         this.checkEdgeRay(blockHit);
     }
 
