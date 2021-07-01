@@ -55,7 +55,15 @@ export class EnemyNpc {
             this.uVecDir.updateDir(angle);
         } else {
             this.searcher.resetSearcher();
-            //let path: Node[] = this.searcher.calculatePath(enemyCell.row, enemyCell.col, playerCell.row, playerCell.col);
+            let path: Node[] = this.searcher.calculatePath(enemyCell.row, enemyCell.col, playerCell.row, playerCell.col);
+            let pathFirstCellXY = this.util.getXYFromMapBlock(path[1].position, this.areaState.getCellWidth(), this.areaState.getCellHeight());
+            let enemyToPathFirstCellVector = {x: pathFirstCellXY.x-this.xPos, y: pathFirstCellXY.y-this.yPos};
+            let enemyToPathFirstCellVectorMag = Math.sqrt(enemyToPathFirstCellVector.x**2 + enemyToPathFirstCellVector.y**2)
+
+            let dotProdRoundedToNearestThousand: number = Math.round(((this.uVecDir.getX()*enemyToPathFirstCellVector.x+this.uVecDir.getY()*enemyToPathFirstCellVector.y) + Number.EPSILON)*1000)/1000;
+            let magProdRoundedToNearestThousand: number = Math.round((enemyToPathFirstCellVectorMag + Number.EPSILON)*1000)/1000;
+            let angle = Math.acos((dotProdRoundedToNearestThousand)/(magProdRoundedToNearestThousand))*180/Math.PI;
+            this.uVecDir.updateDir(angle);
         }
 
         this.xPos += this.uVecDir.getX()*this.velocity;
