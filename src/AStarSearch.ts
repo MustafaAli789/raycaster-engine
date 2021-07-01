@@ -174,6 +174,7 @@ export class AStarSearch {
         let current: Node = endNode;
         this.path.unshift(current);
         while(current.parent_Node != undefined) { //start nodes parent is undef so shuld stop there
+            console.log(current)
             current = current.parent_Node;
             this.path.unshift(current);
         }
@@ -187,6 +188,7 @@ export class AStarSearch {
                     node.g_score = 999999;
                     node.h_score = null;
                     node.f_score = 999999;  
+                    node.parent_Node = undefined;
                 }
                 
             })

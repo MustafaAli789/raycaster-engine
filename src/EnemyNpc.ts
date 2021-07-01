@@ -22,7 +22,7 @@ export class EnemyNpc {
     yPos?: number;
     dim: number = 5;
     uVecDir?: UnitVector;
-    velocity: number = 0.5;
+    velocity: number = 2;
     areaState?: AreaState;
     searcher?: AStarSearch;
 
