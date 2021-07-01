@@ -25,8 +25,8 @@ export class GameState {
 
     constructor(areaState: AreaState, movementAudioControl: AudioControl, shootingAudioControl: AudioControl) {
         this.areaState = areaState;
-        this.player =  new Player(300, 400, new UnitVector(270), areaState, movementAudioControl, shootingAudioControl);
         this.enemyNpcs = [new EnemyNpc(300, 350, new UnitVector(45), areaState)];
+        this.player =  new Player(300, 400, new UnitVector(270), areaState, movementAudioControl, shootingAudioControl);
     }
 
     //Player info

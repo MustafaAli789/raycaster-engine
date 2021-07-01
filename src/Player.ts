@@ -34,6 +34,7 @@ export class Player {
 
     util: Util = new Util();
 
+
     
     constructor(xPos: number, yPos: number, startingDirUVec: UnitVector, areaState: AreaState, movementAudioControl: AudioControl, shootingAudioControl: AudioControl) {
         this.xPos= xPos;
@@ -213,6 +214,7 @@ export class Player {
         if (!this.util.inMapBlock(this.xPos + changeX, this.yPos + changeY, this.areaState.getMap(), this.areaState.getCellWidth(), this.areaState.getCellHeight())) {
             this.yPos += vel*this.dirUVec.getY();
             this.xPos += vel*this.dirUVec.getX();
+            
         }
     }
 
@@ -230,7 +232,7 @@ export class Player {
     }
 
     reset(): void {
-        this.xPos = 300;
+        this.xPos = 375;
         this.yPos = 400;
         this.dirUVec.setDir(270);
     }

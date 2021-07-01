@@ -60,6 +60,11 @@ export class Util {
         return {col: curXBlockIndex, row: curYBlockIndex}
     }
 
+    getXYFromMapBlock(position: Position, cellWidth: number, cellHeight: number): Point {
+        //the lil /2 part is to get center of cell
+        return {x: position.col*cellWidth+cellWidth/2, y:position.row*cellHeight+cellHeight/2}
+    }
+
     inMapBlock(x: number, y: number, map: Map, cellWidth: number, cellHeight: number): boolean {
         return map.getBlocks()[this.getMapBlockFromCoord(x, y, cellWidth, cellHeight).row][this.getMapBlockFromCoord(x, y, cellWidth, cellHeight).col].getBlockType() === BlockType.Wall;
     }
