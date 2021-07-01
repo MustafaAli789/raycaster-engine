@@ -22,3 +22,8 @@ I used many resourced to learn about the algorithms and the basic math needed to
  
  Most algos (collision detection b/w player and wall and bullet and wall, edge of wall detection, etc) made from scratch.
  - Alot of res above were for the square bullets 
+
+
+
+https://user-images.githubusercontent.com/37590511/124070596-0e575800-da0c-11eb-859d-254b5296af5c.mp4
+
