@@ -59,6 +59,11 @@ export class AStarSearch {
         return {x: position.col*this.areaState.getCellWidth()+this.areaState.getCellWidth()/2, y:position.row*this.areaState.getCellHeight()+this.areaState.getCellHeight()/2}
     }
 
+    //had to remove daigonal neighbours to prevent diagonal traversion b/c
+    //it was causing enemies to clip walls as they moved from one block to another.
+    //essentially, i take the path returned by this class and move the enemy to the second ndoe in the path since the first is just the cur node the enemy is in
+    //if the second node is a diagonal node, it might clip a wall along the way 
+    //only way to prevent this is to force enemy to have to visit the center of their cur block first before going to second but its too difficult so i wont bother
     private getNodeNeighbours(curNode: Node, endNode: Node): NodeNeighbour[] {
         let neighBours: NodeNeighbour[] = [];
         let endNodePoint: Point = this.getXYFromRowCol(endNode.position);
