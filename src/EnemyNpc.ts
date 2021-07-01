@@ -37,32 +37,32 @@ export class EnemyNpc {
         this.searcher = new AStarSearch(areaState);
     }
 
+    getAngleToPoint(x: number, y: number): number {
+        let enemyToPlayerVector = {x: x-this.xPos, y: y-this.yPos};
+        let enemyToPlayerVectorMag = Math.sqrt(enemyToPlayerVector.x**2 + enemyToPlayerVector.y**2)
+
+        //Rounding here is VERY IMPORTANT
+        //was having bugs where angle between player dir vector and acc dir to player was nearly 0 resulting in the dot prod and mag to be the same num (which makes sense cause this is the lin alg eqn and it works)
+        //or atleast in theory the same number but due to some js shenanigans, the mag always had one less decimal place making it a tinyyyy bit smaller than the dot product
+        //result in an overall number inside the acos being > 1 resulting in a nan angle and thus resulting in the uvec angle to become and the x and y pos to become nan making the enemy dissapear
+        let dotProdRoundedToNearestThousand: number = Math.round(((this.uVecDir.getX()*enemyToPlayerVector.x+this.uVecDir.getY()*enemyToPlayerVector.y) + Number.EPSILON)*1000)/1000;
+        let magProdRoundedToNearestThousand: number = Math.round((enemyToPlayerVectorMag + Number.EPSILON)*1000)/1000;
+        let angle = Math.acos((dotProdRoundedToNearestThousand)/(magProdRoundedToNearestThousand))*180/Math.PI;
+        return angle;
+    }
+
     move(playerX: number, playerY: number): void {
 
         let playerCell: Position = this.util.getMapBlockFromCoord(playerX, playerY, this.areaState.getCellWidth(), this.areaState.getCellHeight());
         let enemyCell: Position = this.util.getMapBlockFromCoord(this.xPos, this.yPos, this.areaState.getCellWidth(), this.areaState.getCellHeight());
         if (playerCell.col === enemyCell.col && playerCell.row === enemyCell.row) {
-            let enemyToPlayerVector = {x: playerX-this.xPos, y: playerY-this.yPos};
-            let enemyToPlayerVectorMag = Math.sqrt(enemyToPlayerVector.x**2 + enemyToPlayerVector.y**2)
-
-            //Rounding here is VERY IMPORTANT
-            //was having bugs where angle between player dir vector and acc dir to player was nearly 0 resulting in the dot prod and mag to be the same num (which makes sense cause this is the lin alg eqn and it works)
-            //or atleast in theory the same number but due to some js shenanigans, the mag always had one less decimal place making it a tinyyyy bit smaller than the dot product
-            //result in an overall number inside the acos being > 1 resulting in a nan angle and thus resulting in the uvec angle to become and the x and y pos to become nan making the enemy dissapear
-            let dotProdRoundedToNearestThousand: number = Math.round(((this.uVecDir.getX()*enemyToPlayerVector.x+this.uVecDir.getY()*enemyToPlayerVector.y) + Number.EPSILON)*1000)/1000;
-            let magProdRoundedToNearestThousand: number = Math.round((enemyToPlayerVectorMag + Number.EPSILON)*1000)/1000;
-            let angle = Math.acos((dotProdRoundedToNearestThousand)/(magProdRoundedToNearestThousand))*180/Math.PI;
+            let angle: number = this.getAngleToPoint(playerX, playerY);
             this.uVecDir.updateDir(angle);
         } else {
             this.searcher.resetSearcher();
             let path: Node[] = this.searcher.calculatePath(enemyCell.row, enemyCell.col, playerCell.row, playerCell.col);
             let pathFirstCellXY = this.util.getXYFromMapBlock(path[1].position, this.areaState.getCellWidth(), this.areaState.getCellHeight());
-            let enemyToPathFirstCellVector = {x: pathFirstCellXY.x-this.xPos, y: pathFirstCellXY.y-this.yPos};
-            let enemyToPathFirstCellVectorMag = Math.sqrt(enemyToPathFirstCellVector.x**2 + enemyToPathFirstCellVector.y**2)
-
-            let dotProdRoundedToNearestThousand: number = Math.round(((this.uVecDir.getX()*enemyToPathFirstCellVector.x+this.uVecDir.getY()*enemyToPathFirstCellVector.y) + Number.EPSILON)*1000)/1000;
-            let magProdRoundedToNearestThousand: number = Math.round((enemyToPathFirstCellVectorMag + Number.EPSILON)*1000)/1000;
-            let angle = Math.acos((dotProdRoundedToNearestThousand)/(magProdRoundedToNearestThousand))*180/Math.PI;
+            let angle: number = this.getAngleToPoint(pathFirstCellXY.x, pathFirstCellXY.y);
             this.uVecDir.updateDir(angle);
         }
 
