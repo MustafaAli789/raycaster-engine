@@ -61,8 +61,15 @@ export class EnemyNpc {
         } else {
             this.searcher.resetSearcher();
             let path: Node[] = this.searcher.calculatePath(enemyCell.row, enemyCell.col, playerCell.row, playerCell.col);
-            let pathFirstCellXY = this.util.getXYFromMapBlock(path[1].position, this.areaState.getCellWidth(), this.areaState.getCellHeight());
-            let angle: number = this.getAngleToPoint(pathFirstCellXY.x, pathFirstCellXY.y);
+
+            // let pathFirstCellXY = this.util.getXYFromMapBlock(path[0].position, this.areaState.getCellWidth(), this.areaState.getCellHeight());
+            // let pointToMoveTo: {x: number, y: number} = {x: pathFirstCellXY.x, y: pathFirstCellXY.y}
+            // if (this.xPos === pathFirstCellXY.x && this.yPos === pathFirstCellXY.y) {
+            //     let pathSecondCellXY = this.util.getXYFromMapBlock(path[0].position, this.areaState.getCellWidth(), this.areaState.getCellHeight());
+            //     pointToMoveTo
+            // }
+            let pathSecondCellXY = this.util.getXYFromMapBlock(path[1].position, this.areaState.getCellWidth(), this.areaState.getCellHeight());
+            let angle: number = this.getAngleToPoint(pathSecondCellXY.x, pathSecondCellXY.y);
             this.uVecDir.updateDir(angle);
         }
 
@@ -86,7 +93,7 @@ export class EnemyNpc {
         for(let i =0; i<360; i+=incr) {
             let x: number = this.xPos+tempUVec.getX()*(this.dim+projMag);
             let y: number = this.yPos+tempUVec.getY()*(this.dim+projMag);
-            if (x && y && this.util.inMapBlock(x, y, this.areaState.getMap(), this.areaState.getCellWidth(), this.areaState.getCellHeight())) {
+            if (this.util.inMapBlock(x, y, this.areaState.getMap(), this.areaState.getCellWidth(), this.areaState.getCellHeight())) {
                 return true;
             }
             tempUVec.updateDir(incr);

@@ -64,17 +64,17 @@ export class AStarSearch {
         let endNodePoint: Point = this.getXYFromRowCol(endNode.position);
 
         //topleft
-        if (curNode.position.col > 0 && curNode.position.row > 0 && this.nodes[curNode.position.row-1][curNode.position.col-1] != null) {
-            let node: Node = this.nodes[curNode.position.row-1][curNode.position.col-1]
+        // if (curNode.position.col > 0 && curNode.position.row > 0 && this.nodes[curNode.position.row-1][curNode.position.col-1] != null) {
+        //     let node: Node = this.nodes[curNode.position.row-1][curNode.position.col-1]
 
-            if (node.h_score === null) {
-                let curNodePoint: Point = this.getXYFromRowCol(curNode.position);
-                node.h_score = Math.sqrt((endNodePoint.x - curNodePoint.x)**2+(endNodePoint.y-curNodePoint.y)**2)
-            }
+        //     if (node.h_score === null) {
+        //         let curNodePoint: Point = this.getXYFromRowCol(curNode.position);
+        //         node.h_score = Math.sqrt((endNodePoint.x - curNodePoint.x)**2+(endNodePoint.y-curNodePoint.y)**2)
+        //     }
 
-            let neighBour: NodeNeighbour = {node: node, d_val: Math.sqrt(this.cellStraightDist+this.cellStraightDist)}
-            neighBours.push(neighBour);
-        }
+        //     let neighBour: NodeNeighbour = {node: node, d_val: Math.sqrt(this.cellStraightDist+this.cellStraightDist)}
+        //     neighBours.push(neighBour);
+        // }
 
         //top
         if (curNode.position.row > 0 && this.nodes[curNode.position.row-1][curNode.position.col] != null) {
@@ -90,17 +90,17 @@ export class AStarSearch {
         }
 
         //topright
-        if (curNode.position.col < this.nodes[0].length-1 && curNode.position.row > 0 && this.nodes[curNode.position.row-1][curNode.position.col+1] != null) {
-            let node: Node = this.nodes[curNode.position.row-1][curNode.position.col+1]
+        // if (curNode.position.col < this.nodes[0].length-1 && curNode.position.row > 0 && this.nodes[curNode.position.row-1][curNode.position.col+1] != null) {
+        //     let node: Node = this.nodes[curNode.position.row-1][curNode.position.col+1]
 
-            if (node.h_score === null) {
-                let curNodePoint: Point = this.getXYFromRowCol(curNode.position);
-                node.h_score = Math.sqrt((endNodePoint.x - curNodePoint.x)**2+(endNodePoint.y-curNodePoint.y)**2)
-            }
+        //     if (node.h_score === null) {
+        //         let curNodePoint: Point = this.getXYFromRowCol(curNode.position);
+        //         node.h_score = Math.sqrt((endNodePoint.x - curNodePoint.x)**2+(endNodePoint.y-curNodePoint.y)**2)
+        //     }
 
-            let neighBour: NodeNeighbour = {node: node, d_val: Math.sqrt(this.cellStraightDist+this.cellStraightDist)}
-            neighBours.push(neighBour);
-        }
+        //     let neighBour: NodeNeighbour = {node: node, d_val: Math.sqrt(this.cellStraightDist+this.cellStraightDist)}
+        //     neighBours.push(neighBour);
+        // }
 
         //left
         if (curNode.position.col > 0 && this.nodes[curNode.position.row][curNode.position.col-1] != null) {
@@ -129,17 +129,17 @@ export class AStarSearch {
         }
 
         //bottomleft
-        if (curNode.position.col > 0 && curNode.position.row < this.nodes.length-1 && this.nodes[curNode.position.row+1][curNode.position.col-1] != null) {
-            let node: Node = this.nodes[curNode.position.row+1][curNode.position.col-1]
+        // if (curNode.position.col > 0 && curNode.position.row < this.nodes.length-1 && this.nodes[curNode.position.row+1][curNode.position.col-1] != null) {
+        //     let node: Node = this.nodes[curNode.position.row+1][curNode.position.col-1]
 
-            if (node.h_score === null) {
-                let curNodePoint: Point = this.getXYFromRowCol(curNode.position);
-                node.h_score = Math.sqrt((endNodePoint.x - curNodePoint.x)**2+(endNodePoint.y-curNodePoint.y)**2)
-            }
+        //     if (node.h_score === null) {
+        //         let curNodePoint: Point = this.getXYFromRowCol(curNode.position);
+        //         node.h_score = Math.sqrt((endNodePoint.x - curNodePoint.x)**2+(endNodePoint.y-curNodePoint.y)**2)
+        //     }
 
-            let neighBour: NodeNeighbour = {node: node, d_val: Math.sqrt(this.cellStraightDist+this.cellStraightDist)}
-            neighBours.push(neighBour);
-        }
+        //     let neighBour: NodeNeighbour = {node: node, d_val: Math.sqrt(this.cellStraightDist+this.cellStraightDist)}
+        //     neighBours.push(neighBour);
+        // }
 
         //bottom
         if (curNode.position.row < this.nodes.length-1 && this.nodes[curNode.position.row+1][curNode.position.col] != null) {
@@ -155,17 +155,17 @@ export class AStarSearch {
         }
 
         //bottomright
-        if (curNode.position.col < this.nodes[0].length-1 && curNode.position.row < this.nodes.length-1 && this.nodes[curNode.position.row+1][curNode.position.col+1] != null) {
-            let node: Node = this.nodes[curNode.position.row+1][curNode.position.col+1]
+        // if (curNode.position.col < this.nodes[0].length-1 && curNode.position.row < this.nodes.length-1 && this.nodes[curNode.position.row+1][curNode.position.col+1] != null) {
+        //     let node: Node = this.nodes[curNode.position.row+1][curNode.position.col+1]
 
-            if (node.h_score === null) {
-                let curNodePoint: Point = this.getXYFromRowCol(curNode.position);
-                node.h_score = Math.sqrt((endNodePoint.x - curNodePoint.x)**2+(endNodePoint.y-curNodePoint.y)**2)
-            }
+        //     if (node.h_score === null) {
+        //         let curNodePoint: Point = this.getXYFromRowCol(curNode.position);
+        //         node.h_score = Math.sqrt((endNodePoint.x - curNodePoint.x)**2+(endNodePoint.y-curNodePoint.y)**2)
+        //     }
 
-            let neighBour: NodeNeighbour = {node: node, d_val: Math.sqrt(this.cellStraightDist+this.cellStraightDist)}
-            neighBours.push(neighBour);
-        }
+        //     let neighBour: NodeNeighbour = {node: node, d_val: Math.sqrt(this.cellStraightDist+this.cellStraightDist)}
+        //     neighBours.push(neighBour);
+        // }
 
         return neighBours;
     }

@@ -41,4 +41,17 @@ export class Map {
     getBlocks(): Block[][] {
         return this.blocks;
     }
+
+    getRandomEmptyBlock(): Block {
+        let emptyBlocks: Block[] = []
+        this.blocks.forEach(row => {
+            row.forEach(block => {
+                if (block.blockType === BlockType.Empty) {
+                    emptyBlocks.push(block);
+                }
+            })
+        })
+
+        return emptyBlocks[Math.round(Math.random()*emptyBlocks.length)]
+    }
 }

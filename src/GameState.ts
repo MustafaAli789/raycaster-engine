@@ -5,12 +5,10 @@ import { Bullet } from "./Bullet";
 import { AreaState } from "./AreaState";
 import { EnemyNpc } from "./EnemyNpc";
 import { Util } from "./Util";
+import { Block } from "./Block";
 
-enum ObjectHit {
-    Player,
-    Wall,
-    Ray,
-    None
+interface Position {
+    col: number, row: number
 }
 
 export class GameState {
@@ -128,7 +126,10 @@ export class GameState {
             this.totNumEnemiesInWave++;
             this.numEnemiesRemaining = this.totNumEnemiesInWave;
             for (let i = 0; i<this.totNumEnemiesInWave; i++) {
-                this.enemyNpcs.push(new EnemyNpc(300, 350, new UnitVector(Math.random()*360), this.areaState));
+                let randomBlock: Block = this.areaState.getMap().getRandomEmptyBlock();
+                let randomPosition: Position = {col: randomBlock.col, row:randomBlock.row};
+                let randomPosXY: {x: number, y: number} = this.util.getXYFromMapBlock(randomPosition, this.areaState.getCellWidth(), this.areaState.getCellHeight())
+                this.enemyNpcs.push(new EnemyNpc(randomPosXY.x, randomPosXY.y, new UnitVector(Math.random()*360), this.areaState));
             }
         }
     }
